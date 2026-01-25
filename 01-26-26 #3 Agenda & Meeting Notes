@@ -8,3 +8,5 @@ FINALIZE TOPIC:
         and fruits. 
     -> he recommends looking up information on MIND and Mediterranean diets as these are relevant to PD onset and explicitly cover each of 
        these food groups. 
+- Our next steps: 1. start running the PD dataset through the QIIME2 pipeline 2. Research into each of the foods to see if they are correlated 
+  with microbiome data. -> Choose foods with the least amount of prior analysis. 

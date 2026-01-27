@@ -12,7 +12,17 @@ FINALIZE TOPIC:
   with microbiome data. -> Choose foods with the least amount of prior analysis. 
 
 - Possible Research Question after suggestion: 
-Is dietary intake of milk and antioxidants associated with gut microbiome composition and the age of Parkinson’s disease onset?
+Is dietary intake of antioxidants associated with gut microbiome composition and the age of Parkinson’s disease onset?
 
 01/26/26 Meeting:
+Our set research question: 
+Is dietary intake of antioxidants associated with gut microbiome composition and the age of Parkinson’s disease onset?
 
+- How our work will be distributed among the group members: will be discussed after the meeting
+- We should give ourselves enough time for code as the code itself will take a while -> Start Qiime ASAP
+- Step that will take the longest: training our own classifiers
+  -> Under module 6 (MPT: Taxonomic analysis), there is a code for training your classifiers
+- Find primers under the method section of the literature
+  -> Should be a document that contains the sequence of the primers 
+- For the group assignment, the Parkinson dataset isn't public, thus go over the literature review and UJEMI. 
+- We should filter the dataset -> exclude mitochondrial and chloroplast

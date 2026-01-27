@@ -33,7 +33,7 @@ qiime metadata tabulate \
 qiime feature-table summarize \
   --i-table table.qza \
   --o-visualization table.qzv \
-  --m-sample-metadata-file /datasets/project_1/moving_pictures/sample-metadata.tsv
+  --m-sample-metadata-file /datasets/project_2/parkinsons/parkinsons_metadata.txt
   
 qiime feature-table tabulate-seqs \
   --i-data rep-seqs.qza \

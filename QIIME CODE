@@ -38,3 +38,34 @@ qiime feature-table summarize \
 qiime feature-table tabulate-seqs \
   --i-data rep-seqs.qza \
   --o-visualization rep-seqs.qzv
+
+qiime feature-classifier extract-reads \
+  --i-sequences /datasets/silva_ref_files/silva-138-99-seqs.qza \
+  --p-f-primer GTGCCAGCMGCCGCGGTAA \
+  --p-r-primer GGACTACHVHHHTWTCTAAT \
+  --p-trunc-len 251 \
+  --o-reads ref-seqs-trimmed.qza
+
+qiime feature-classifier fit-classifier-naive-bayes \
+  --i-reference-reads ref-seqs-trimmed.qza \
+  --i-reference-taxonomy /datasets/silva_ref_files/silva-138-99-tax.qza \
+  --o-classifier classifier.qza
+
+qiime feature-classifier classify-sklearn \
+  --i-classifier classifier.qza \
+  --i-reads rep-seqs.qza \
+  --o-classification taxonomy.qza
+
+qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences rep-seqs.qza \
+  --o-alignment aligned-rep-seqs.qza \
+  --o-masked-alignment masked-aligned-rep-seqs.qza \
+  --o-tree unrooted-tree.qza \
+  --o-rooted-tree rooted-tree.qza 
+
+qiime diversity alpha-rarefaction \
+  --i-table table.qza \
+  --i-phylogeny rooted-tree.qza \
+  --p-max-depth 24026 \
+  --m-metadata-file /datasets/project_2/parkinsons/parkinsons_metadata.txt \
+  --o-visualization alpha-rarefaction.qzv 

@@ -5,4 +5,29 @@
 - Current plan for this week: Start splitting up the work for Group assignment 2 
 - would like to set up zoom team meeting for next week (reading break) if possible
 
-Meeting notes:
+Meeting notes: :) 
+
+Tentative schedule meeting for next Wednesday 1600 (18 FEB)- 
+Group assignment 2:
+- come up with 2-5 research aim to answer research question -> prepare for group proposal
+- what are we trying to answer with these statistical test?
+- split upt the work (recommendation):
+  - read into module 12-14 (specifically 13, 14) -> relevant for group assignment 2
+  - come up with research aims (maybe send aims to Claire beforehand)
+  - potentially start with writing the proposal (how projects fits into field, why people looked antioxidants in relation to PD)
+- cite recent papers (2000~), Microbiome field (2010~)
+- categorize numerical variables into bins (worry: don't want uneven number of samples between groups)
+  - maybe use mean and standard deviation if that is the case but less biological relevant 
+  - mutate (case_when)
+- worked out binning strategy before starting group assignment 2 
+- run permanova to see which antioxidants affects microbiome the most 
+- should not run kruksal wallis -> have to account for false discovery rate (not recommended)
+
+Tasks to do next week:
+- go through with module readings
+- bin samples (stratification) to figure out if we can use Norfolk, whether they are uneven
+- think of research aims 
+- zoom meeting link will be sent on canvas\
+
+
+

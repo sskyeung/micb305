@@ -1,4 +1,3 @@
-
 metadata = read.delim('parkinsons_metadata 2 2.txt', header = TRUE, row.names = 1)
 metadata_PD <- subset(metadata, Disease == "PD")
 
@@ -17,7 +16,13 @@ PD_sum = metadata_PD |>
     p33_selenium = quantile(Selenium, 0.33, na.rm = TRUE),
     p66_selenium = quantile(Selenium, 0.66, na.rm = TRUE),
     p33_Vitamin_A = quantile(Vitamin_A, 0.33, na.rm = TRUE),
-    p66_Vitamin_A = quantile(Vitamin_A, 0.66, na.rm = TRUE))
+    p66_Vitamin_A = quantile(Vitamin_A, 0.66, na.rm = TRUE),
+    p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
+    p66_Vitamin_C = quantile(Vitamin_C, 0.66, na.rm = TRUE),
+    p33_Vitamin_E = quantile(Vitamin_E, 0.33, na.rm = TRUE),
+    p66_Vitamin_E = quantile(Vitamin_E, 0.66, na.rm = TRUE),
+    p33_Car_total = quantile(Carotene_total, 0.33, na.rm = TRUE),
+    p66_Car_total = quantile(Carotene_total, 0.66, na.rm = TRUE))
 
 PD_grouped = metadata_PD %>% 
   mutate(Age_onset =
@@ -71,7 +76,28 @@ PD_binned = PD_grouped |>
                      Sex == "Male" & Vitamin_A ~ "Typical",
                      Sex == "Female" & Vitamin_A > 408.9522 ~ "High",
                      Sex == "Female" & Vitamin_A < 223.012 ~ "Low",
-                     Sex == "Female" & Vitamin_A ~ "Typical"))
+                     Sex == "Female" & Vitamin_A ~ "Typical"),
+         Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 117.5009 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "Typical",
+                     Sex == "Female" & Vitamin_C > 162.6396 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "Typical"),
+         Vitamin_E =
+           case_when(Sex == "Male" & Vitamin_E > 12.08046 ~ "High",
+                     Sex == "Male" & Vitamin_E < 8.652149 ~ "Low",
+                     Sex == "Male" & Vitamin_E ~ "Typical",
+                     Sex == "Female" & Vitamin_E > 14.09417 ~ "High",
+                     Sex == "Female" & Vitamin_E < 10.580000 ~ "Low",
+                     Sex == "Female" & Vitamin_E ~ "Typical"),
+         Carotene_total =
+           case_when(Sex == "Male" & Carotene_total > 3994.850 ~ "High",
+                     Sex == "Male" & Carotene_total < 2495.81 ~ "Low",
+                     Sex == "Male" & Carotene_total ~ "Typical",
+                     Sex == "Female" & Carotene_total > 5651.388 ~ "High",
+                     Sex == "Female" & Carotene_total < 3636.83 ~ "Low",
+                     Sex == "Female" & Carotene_total ~ "Typical"),)
 
 ```
 ## starting from below is just viewing count
@@ -79,6 +105,7 @@ PD_binned = PD_grouped |>
 PD_select = PD_binned |>
   select(Alpha_carotene,Beta_carotene, Copper, Manganese, Selenium, Vitamin_A) |>
   drop_na()
+
 
 Alpha_count = PD_binned |>
   group_by(Age_onset) |>
@@ -110,4 +137,17 @@ Vitamin_A_count = PD_binned |>
   count(Vitamin_A) |>
   drop_na()
 
-``
+Vit_C_count = PD_binned |>
+  group_by(Age_onset) |>
+  count(Vitamin_C) |>
+  drop_na()
+Vit_E_count = PD_binned |>
+  group_by(Age_onset) |>
+  count(Vitamin_E) |>
+  drop_na()
+
+Car_total_count = PD_binned |>
+  group_by(Age_onset) |>
+  count(Carotene_total) |>
+  drop_na()
+```

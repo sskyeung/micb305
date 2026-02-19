@@ -106,48 +106,47 @@ PD_select = PD_binned |>
   select(Alpha_carotene,Beta_carotene, Copper, Manganese, Selenium, Vitamin_A) |>
   drop_na()
 
-
 Alpha_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Alpha_carotene) |>
   drop_na()
 
 Beta_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Beta_carotene) |>
   drop_na()
 
 Copper_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Copper) |>
   drop_na()
 
 Manganese_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Manganese) |>
   drop_na()
 
 Selenium_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Selenium) |>
   drop_na()
 
 Vitamin_A_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Vitamin_A) |>
   drop_na()
 
 Vit_C_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Vitamin_C) |>
   drop_na()
 Vit_E_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Vitamin_E) |>
   drop_na()
 
 Car_total_count = PD_binned |>
-  group_by(Age_onset) |>
+  group_by(Age_onset,Sex) |>
   count(Carotene_total) |>
   drop_na()
 ```

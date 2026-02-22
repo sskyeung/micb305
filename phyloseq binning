@@ -1,0 +1,21 @@
+taxonomy_formatted = taxonomy %>%
+  separate(col= Taxon,
+           into = c('Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'),
+           sep = '; ', fill = 'right') %>%
+  select(-Confidence) %>%
+  as.matrix()
+
+counts_formatted = as.matrix(counts)
+
+metadata_age_grouped = metadata %>%
+  mutate(Age_onset =
+      case_when(Age_onset  < 50 ~ "40s",
+                between(Age_onset, 50, 59) ~ "50s",
+                between(Age_onset, 60, 69) ~ "60s",
+                Age_onset >= 70 ~ "70s")) %>%
+  drop_na(Age_onset, BMI) 
+
+ps <- phyloseq(sample_data(metadata_age_grouped),
+               otu_table(counts_formatted, taxa_are_rows = T),
+               tax_table(taxonomy_formatted),
+               tree)

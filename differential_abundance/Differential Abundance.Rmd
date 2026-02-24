@@ -1,0 +1,119 @@
+---
+title: "Differential_abundance"
+output: html_document
+date: "2026-02-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+library(writexl)
+library(ANCOMBC)
+library(ggpubr)
+```
+
+```{r}
+metadata = read.delim('parkinsons_metadata.txt', row.names = 1)
+taxonomy = read.delim('taxonomy.tsv', row.names = 1) # from qiime2
+counts = read.delim('feature-table.txt', skip=1, row.names=1)  # from qiime2
+tree = read_tree('tree.nwk')
+```
+
+```{r}
+taxonomy_formatted <- taxonomy %>% 
+  separate(col = Taxon, 
+           into = c('Domain', 'Phylum', 'Class', 'Order', 
+                    'Family', 'Genus', 'Species'),
+           sep = ';', fill = 'right') %>% 
+  select(-Confidence) %>% 
+  as.matrix()
+
+counts_formatted <- counts %>% as.matrix()
+
+View(metadata)
+
+
+ps = phyloseq(sample_data(metadata),
+              otu_table(counts_formatted, taxa_are_rows = TRUE),
+              tax_table(taxonomy_formatted),
+              tree)
+
+saveRDS(ps, 'phyloseq_taxonomy.rds')
+```
+
+```{r}
+ps_subset = subset_samples(ps, Disease == "PD")
+alpha_carotene_split <-  quantile(data.frame(ps@sam_data)$Alpha_carotene, 
+                                       probs = c(0, 0.33, 0.67, 1), 
+                                       na.rm = TRUE)
+beta_carotene_split <-  quantile(data.frame(ps@sam_data)$Beta_carotene, 
+                                       probs = c(0, 0.33, 0.67, 1), 
+                                       na.rm = TRUE)
+Vitamin_A_split <-  quantile(data.frame(ps@sam_data)$Vitamin_A, 
+                                       probs = c(0, 0.33, 0.67, 1), 
+                                       na.rm = TRUE)
+Vitamin_C_split <-  quantile(data.frame(ps@sam_data)$Vitamin_C, 
+                                       probs = c(0, 0.33, 0.67, 1), 
+                                       na.rm = TRUE)
+Selenium_split <-  quantile(data.frame(ps@sam_data)$Selenium, 
+                                       probs = c(0, 0.33, 0.67, 1), 
+                                       na.rm = TRUE)
+
+metadata_grouped <- data.frame(ps@sam_data) %>%
+  mutate(Alpha_Carotene_group = 
+           case_when(
+             Alpha_carotene <= alpha_carotene_split[2] ~ '1',
+             Alpha_carotene <= alpha_carotene_split[3] ~ '2',
+             Alpha_carotene <= alpha_carotene_split[4] ~ '3')) %>% 
+  mutate(Beta_Carotene_group = 
+           case_when(
+             Beta_carotene <= beta_carotene_split[2] ~ '1',
+             Beta_carotene <= beta_carotene_split[3] ~ '2',
+             Beta_carotene <= beta_carotene_split[4] ~ '3')) %>% 
+  mutate(Vitamin_A_group = 
+           case_when(
+             Vitamin_A <= Vitamin_A_split[2] ~ '1',
+             Vitamin_A <= Vitamin_A_split[3] ~ '2',
+             Vitamin_A <= Vitamin_A_split[4] ~ '3')) %>% 
+  mutate(Vitamin_C_group = 
+           case_when(
+             Vitamin_C <= Vitamin_C_split[2] ~ '1',
+             Vitamin_C <= Vitamin_C_split[3] ~ '2',
+             Vitamin_C <= Vitamin_C_split[4] ~ '3')) %>% 
+  mutate(Selenium_group = 
+           case_when(
+             Selenium <= Selenium_split[2] ~ '1',
+             Selenium <= Selenium_split[3] ~ '2',
+             Selenium <= Selenium_split[4] ~ '3'))
+sample_data(ps) = sample_data(metadata_grouped)
+```
+
+```{r}
+set.seed(421)
+ps_genus = tax_glom(ps, 'Genus')
+out = ancombc2( ps_genus,
+          fix_formula = "Beta_Carotene_group",
+          p_adj_method = "BH",
+          prv_cut = 0.1 )
+
+statistical_table = out$res %>% 
+  filter(diff_robust_Beta_Carotene_group3 == TRUE)
+
+ps_family = tax_glom(ps, 'Family')
+out_family = ancombc2( ps_family,
+          fix_formula = "Beta_Carotene_group",
+          p_adj_method = "BH",
+          prv_cut = 0.1 )
+
+statistical_family = out_family$res %>% 
+  filter(diff_robust_Beta_Carotene_group3 == TRUE)
+
+```

@@ -3,3 +3,48 @@ Agenda:
   > We have done Alpha, Beta, and Differential abundance.
 > Discuss Group Assignment 2
 > Discuss, are we on the right track to continue moving forward or do we still need more changes to our research?
+
+Meeting:
+>taxonomy plot
+  >should look at family level and genus level - some bacterial families, the taxa within those families perform similar functions
+>differential abundance
+  >should only do antioxidants of interest
+  >no differential abundance can just be a result
+  >she said the separating into thirds should be fine
+
+>main feedback for group assignment
+  >logical flow is not very clear in the way we worded the questions - should be reworded
+
+association between microbiome and antioxidants - and how that correlates w age of onset - reword this -> kyle said smth good here but was too quick - smth about antioxidants linked to microbiome changes and then how that may be used to predict age of onset?
+1. diversity -> make more clear, kind of meandering, just say identify which dietary antioxidants most strongly affect microbiome composition and diversity in PD patients
+> core microbiome does not include any statistics - remove this
+2. differential abundance analysis -> (this looks at specific changes vs the overall changes addressed in aim 1) wording is a bit meandering - highlight the focus on antioxidants that specifically have the most effects on microbiome
+>"based off of aim 1, determine differential abundance taxa for antioxidant intake"
+>don't do both indicator and differential
+>differential abundance has more flexibility on presentation - like volcano plot or bar plots (taxa 1, taxa 2, taxa 3 - w diff groups data for each)
+>be careful of wording used - "impact" -> implies causation - say "associated with", "correlates" instead
+3. Function (PICRUSt2) - be more clear with wording = antioxidants may have a functionnal impact on microbiome (increase in antiinflammatory pathways, decrease in inflammatory pathways, change neurometabolite pathway)
+4. RF to predict age of onset - more description needed
+>find antioxidant associated microbes then build model to predict age of onset
+overall:
+>bones of aims are good but just need to tie back better to research question and goals
+
+>having a ganchart can be good for deadlines
+
+proposal advice:
+>get started on intro/background asap
+>start compiling literature review
+>mainly focus on why we are researching this topic
+  >how might antioxidants affect the microbiome
+  >how does microbiome change in pd and non pd people
+  >how can we link the two or why would they be linked
+>dont cite reviews, cite primary source
+>set.seed it doesnt matter if its separate tests but 
+>rarefaction depth we will use is the one from group assignment 1
+
+for next meeting
+>maybe have a draft background/intro
+>reword aims and research question
+>discuss analyses
+
+

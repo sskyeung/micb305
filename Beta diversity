@@ -154,4 +154,109 @@ Vit_E_stats = Vit_E_stats %>% rename(Pval = `Pr(>F)`) %>%
 
 Vit_E_stats 
 
+
+
+#### Denali Beta Diversity code ###
+
+library(phyloseq)
+library(vegan)
+library(dplyr)
+library(ggplot2)
+
+ps <- readRDS("project_data/phyloseq_taxonomy.rds")
+
+psrare = ps %>%
+  rarefy_even_depth(sample.size = 5000, rngseed = 1)
+
+table(sample_sums(psrare))
+
+colnames(sample_data(psrare))
+pd_only_rare <- subset_samples(psrare, Disease == "PD")
+
+
+#Take out the ASV matrix from the phyloseq object and convert it to a dataframe.
+ASV_table_all <-  otu_table(psrare)
+ASV_table_all <-  data.frame(ASV_table_all)
+ASV_table_allt <- t(ASV_table_all)               # transpose so Sample ID's are the rownames
+
+#Take out the metadata from the phyloseq object and convert it to a dataframe.
+meta_dataframe <-  sample_data(psrare) %>%
+  data.frame()#idk if this is necessary
+
+meta_pd_dataframe <-  sample_data(pd_only_rare) %>%
+  data.frame()
+
+meta_antioxidants <- meta_pd_dataframe[,c("Age_onset", "Alpha_carotene", "Beta_carotene", "Carotene_total", "Copper", "Manganese", "Vitamin_A", "Vitamin_A_equiv", "Selenium", "Vitamin_C", "Vitamin_E")]
+
+#Without filtering the metadata, the following line captures all column headers.
+antioxidants = colnames(meta_antioxidants)
+
+#Build an empty list that will be filled up by the loop
+adonis_res = list()   
+
+#Create a loop to go over each variable in the metadata.
+for (i in 1:11){                                #COMPLETE the for loop argument. You need to to loop through as many variables that are present in "nutrients". Use a range, IE (1:?)
+  print(i)                                                 #Printing i to keep track of loop progress
+  print(antioxidants[[i]])
+  meta_anti_df <- data.frame(meta_antioxidants[!is.na(meta_antioxidants[, i]), ])    #Remove the rows in metadata that contain missing data for the i'th variable
+
+samples = rownames(meta_anti_df)   #Create a vector of all the samples in the metadata after removing NAs¨
+
+ASV_mat <- ASV_table_allt[match(rownames(meta_anti_df), rownames(ASV_table_allt)),]                                              #Filter the ASV_table to remove the same individuals that were filtered out for NA values 
+                                #This is important because we need the number of individuals represented in the ASV table and metadata to be the same.
+
+bray_ds = vegdist(ASV_mat, method = "bray",diag =T, upper = T) #Create the distance matrix based on a bray-curtis dissimilarity model
+adonis_res[[i]] = vegan::adonis2(as.formula(paste("bray_ds~",antioxidants[[i]],sep = "")), data = meta_anti_df) #This line runs the PERMANOVA test and puts it into the empty list we made above.
+}
+
+#Create an empty table to import the R-squared and pvalue.
+result_ma = matrix(NA, nrow = length(antioxidants), ncol =2)
+
+#Loop though each variable and generate a table that can be plotted.
+for (i in 1:11){ #This for loop argument will be the same as on line 60
+  
+  result_ma[i,1] = adonis_res[[i]][1,3] #Grab the R-squared statistic
+  result_ma[i,2] = adonis_res[[i]][1,5]#Grab the pvalue
+
+}
+
+rownames(result_ma) <-  c(antioxidants)                           #Convert the rowmanes to variables 
+colnames(result_ma) <-  c("R2", "Pvalue")                      #Change the column names TO "R2" AND "Pvalue"
+result_ma <-  data.frame(result_ma, stringsAsFactors = F)           #Convert it to a data.frame (easiest to work with when plotting)
+result_ma$Padjust <-  p.adjust(result_ma$Pvalue, method = "fdr")    #Generate an adjusted pvalue to correct for the probability of false positives
+result_ma$Antioxidant <-  c(antioxidants) 
+View(result_ma)
+save(result_ma, file="result_ma.RData")
+
+#filter the results table to only include significant variables with a pvalue<0.05
+
+result_filtered_p <- result_ma %>% filter(Pvalue < 0.05)
+result_filtered_pad <- result_ma %>% filter(Padjust < 0.05)
+
+# Visualize Nutrients with Significant P-values < 0.05
+
+results_pvalue <- ggplot(data = result_filtered_p, aes(x = reorder(Antioxidant, R2, decreasing = FALSE),y=R2)) +
+  geom_bar(stat='identity') +
+  coord_flip() + 
+  labs(y = "Adonis R2", x = "Antioxidant", title = "Antioxidants with P-Value < 0.05 in PD Population")
+results_pvalue
+
+# save png file
+ggsave(filename = "results_pvalue.png"
+       , results_pvalue
+       , height=4, width=4)
+
+# Visualize Nutrients with Significant adjusted P-values < 0.05
+
+results_padjust <- ggplot(data = result_filtered_pad, aes(x = reorder(Antioxidant, R2, decreasing = FALSE),y=R2)) +
+  geom_bar(stat='identity') +
+  coord_flip() + 
+  labs(y = "Adonis R2", x = "Antioxidant", title = "Antioxidants with Adjusted P < 0.05 in PD Population")
+results_padjust
+
+# save png
+ggsave(filename = "results_pvadjust.png"
+       , results_padjust
+       , height=4, width=4)
+
 ```

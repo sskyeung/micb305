@@ -1,2 +1,12 @@
 Agenda:
 > Can we reference the reader to go to GitHub for more specifications (ex, data classification binning details like actual numbers)
+
+Reworded Aims to get approved by:
+1. Identify dietary antioxidants that correlate with microbiome diversity most significantly.
+    -> Supported with statistical testing using ANOVA/ Kruskal-Wallis test and Bray-Curtis dissimilarity using PERMANOVA
+2. Identify indicator taxa and taxa that are differentially abundant in the microbiomes of Parkinson’s Disease patients grouped by antioxidant stratified levels of high, medium, or low.
+    -> This will pinpoint the antioxidant condition that impacts the microbial composition
+3. Investigate the relationship between the functional pathways influenced by antioxidant-associated microbes and Parkinson’s Disease age of onset using PICRUSt2.
+    -> **do we want to include picrust2 in the actual aim or leave it for the description below it.
+4. Investigate the capability of antioxidant intake levels to predict Parkinson’s Disease age of onset using a Random Forest Model.
+

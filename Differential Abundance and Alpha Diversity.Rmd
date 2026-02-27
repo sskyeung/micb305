@@ -1,0 +1,223 @@
+---
+title: "Differentiatl_abundance_with_jeremy_data"
+output: html_document
+date: "2026-02-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Loading Library
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+library(writexl)
+library(ANCOMBC)
+library(ggpubr)
+```
+## Importing into R
+```{r}
+metadata = read.delim('parkinsons_metadata.txt', row.names = 1)
+taxonomy = read.delim('taxonomy.tsv', row.names = 1) # from qiime2
+counts = read.delim('feature-table.txt', skip=1, row.names=1)  # from qiime2
+tree = read_tree('tree.nwk')
+```
+
+## Creating Phyloseq object
+```{r}
+taxonomy_formatted <- taxonomy %>% 
+  separate(col = Taxon, 
+           into = c('Domain', 'Phylum', 'Class', 'Order', 
+                    'Family', 'Genus', 'Species'),
+           sep = ';', fill = 'right') %>% 
+  select(-Confidence) %>% 
+  as.matrix()
+
+counts_formatted <- counts %>% as.matrix()
+ps = phyloseq(sample_data(metadata),
+              otu_table(counts_formatted, taxa_are_rows = TRUE),
+              tax_table(taxonomy_formatted),
+              tree)
+```
+
+
+
+## Subsetting and Binning
+
+```{r}
+ps_subset = subset_samples(ps, Disease == "PD")
+metadata_PD = data.frame(ps_subset@sam_data)
+
+PD_sum = metadata_PD |>
+  group_by(Sex) |>
+  summarise(
+    p33_alpha_carotene = quantile(Alpha_carotene, 0.33, na.rm = TRUE),
+    p66_alpha_carotene = quantile(Alpha_carotene, 0.66, na.rm = TRUE),
+    p33_beta_carotene = quantile(Beta_carotene, 0.33, na.rm = TRUE),
+    p66_beta_carotene = quantile(Beta_carotene, 0.66, na.rm = TRUE),
+    p33_Copper = quantile(Copper, 0.33, na.rm = TRUE),
+    p66_Copper = quantile(Copper, 0.66, na.rm = TRUE),
+    p33_manganese = quantile(Manganese, 0.33, na.rm = TRUE),
+    p66_manganese = quantile(Manganese, 0.66, na.rm = TRUE),
+    p33_selenium = quantile(Selenium, 0.33, na.rm = TRUE),
+    p66_selenium = quantile(Selenium, 0.66, na.rm = TRUE),
+    p33_Vitamin_A = quantile(Vitamin_A, 0.33, na.rm = TRUE),
+    p66_Vitamin_A = quantile(Vitamin_A, 0.66, na.rm = TRUE),
+    p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
+    p66_Vitamin_C = quantile(Vitamin_C, 0.66, na.rm = TRUE),
+    p33_Vitamin_E = quantile(Vitamin_E, 0.33, na.rm = TRUE),
+    p66_Vitamin_E = quantile(Vitamin_E, 0.66, na.rm = TRUE),
+    p33_Car_total = quantile(Carotene_total, 0.33, na.rm = TRUE),
+    p66_Car_total = quantile(Carotene_total, 0.66, na.rm = TRUE))
+
+PD_grouped = metadata_PD %>% 
+  mutate(Age_onset =
+           case_when(Age_onset  < 50 ~ "40s",
+                     between(Age_onset, 50, 59) ~ "50s",
+                     between(Age_onset, 60, 69) ~ "60s",
+                     Age_onset >= 70 ~ "70s"))
+
+#PD_male_grouped <- subset(metadata_PD, Sex == "Male")  == 122 patients
+#PD_female_grouped <- subset(metadata_PD, Sex == "Female") == 75 patients
+
+PD_binned = PD_grouped |>
+  mutate(Alpha_carotene =
+           case_when(Sex == "Male" & Alpha_carotene > 548.2000 ~ "High",
+                     Sex == "Male" & Alpha_carotene < 189.350 ~ "Low",
+                     Sex == "Male" & Alpha_carotene ~ "Typical",
+                     Sex == "Female" & Alpha_carotene > 571.3539 ~ "High",
+                     Sex == "Female" & Alpha_carotene < 541.904 ~ "Low",
+                     Sex == "Female" & Alpha_carotene ~ "Typical"),
+         Beta_carotene = 
+           case_when(Sex == "Male" & Beta_carotene > 3522.162 ~ "High",
+                     Sex == "Male" & Beta_carotene < 2229.975 ~ "Low",
+                     Sex == "Male" & Beta_carotene ~ "Typical",
+                     Sex == "Female" & Beta_carotene > 4992.952 ~ "High",
+                     Sex == "Female" & Beta_carotene < 3178.988 ~ "Low",
+                     Sex == "Female" & Beta_carotene ~ "Typical"),
+         Copper = 
+           case_when(Sex == "Male" & Copper > 1.2 ~ "High",
+                     Sex == "Male" & Copper < 0.8431575 ~ "Low",
+                     Sex == "Male" & Copper ~ "Typical",
+                     Sex == "Female" & Copper > 1.276798 ~ "High",
+                     Sex == "Female" & Copper < 1 ~ "Low",
+                     Sex == "Female" & Copper ~ "Typical"),
+         Manganese = 
+           case_when(Sex == "Male" & Manganese > 3.088210 ~ "High",
+                     Sex == "Male" & Manganese < 2.43 ~ "Low",
+                     Sex == "Male" & Manganese ~ "Typical",
+                     Sex == "Female" & Manganese > 3.837956 ~ "High",
+                     Sex == "Female" & Manganese < 2.574287 ~ "Low",
+                     Sex == "Female" & Manganese ~ "Typical"),
+         Selenium = 
+           case_when(Sex == "Male" & Selenium > 58.29365 ~ "High",
+                     Sex == "Male" & Selenium < 42.72238 ~ "Low",
+                     Sex == "Male" & Selenium ~ "Typical",
+                     Sex == "Female" & Selenium > 65.14686 ~ "High",
+                     Sex == "Female" & Selenium < 44.83593 ~ "Low",
+                     Sex == "Female" & Selenium ~ "Typical"),
+         Vitamin_A =
+           case_when(Sex == "Male" & Vitamin_A > 311.4622 ~ "High",
+                     Sex == "Male" & Vitamin_A < 191.623 ~ "Low",
+                     Sex == "Male" & Vitamin_A ~ "Typical",
+                     Sex == "Female" & Vitamin_A > 408.9522 ~ "High",
+                     Sex == "Female" & Vitamin_A < 223.012 ~ "Low",
+                     Sex == "Female" & Vitamin_A ~ "Typical"),
+         Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 117.5009 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "Typical",
+                     Sex == "Female" & Vitamin_C > 162.6396 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "Typical"),
+         Vitamin_E =
+           case_when(Sex == "Male" & Vitamin_E > 12.08046 ~ "High",
+                     Sex == "Male" & Vitamin_E < 8.652149 ~ "Low",
+                     Sex == "Male" & Vitamin_E ~ "Typical",
+                     Sex == "Female" & Vitamin_E > 14.09417 ~ "High",
+                     Sex == "Female" & Vitamin_E < 10.580000 ~ "Low",
+                     Sex == "Female" & Vitamin_E ~ "Typical"),
+         Carotene_total =
+           case_when(Sex == "Male" & Carotene_total > 3994.850 ~ "High",
+                     Sex == "Male" & Carotene_total < 2495.81 ~ "Low",
+                     Sex == "Male" & Carotene_total ~ "Typical",
+                     Sex == "Female" & Carotene_total > 5651.388 ~ "High",
+                     Sex == "Female" & Carotene_total < 3636.83 ~ "Low",
+                     Sex == "Female" & Carotene_total ~ "Typical"),)
+ps_jeremy_data = ps_subset
+sample_data(ps_jeremy_data) = sample_data(PD_binned)
+```
+
+
+##Differential Abundance
+```{r}
+set.seed(421)
+ps_genus = tax_glom(ps_jeremy_data, 'Genus')
+out = ancombc2( ps_genus,
+          fix_formula = "Vitamin_C",
+          p_adj_method = "BH",
+          prv_cut = 0.1 )
+
+ statistical_table = out$res %>% 
+  filter(diff_robust_Vitamin_CLow == TRUE)
+
+ps_family = tax_glom(ps_jeremy_data, 'Family')
+out_family = ancombc2( ps_family,
+          fix_formula = "Vitamin_C",
+          p_adj_method = "BH",
+          prv_cut = 0.1 )
+
+statistical_family = out_family$res %>% 
+  filter(diff_robust_Vitamin_CLow == TRUE)
+
+```
+
+##Deciding Sampling Depth
+```{r}
+sampling_depth <- PD_binned %>% 
+#Adding sampling depth as a column 
+  mutate(depth = sample_sums(ps_jeremy_data))%>% 
+  # Finding the 10th least sampling depth in each group
+  group_by(Vitamin_C) %>% 
+  arrange(desc(depth), .by_group =T) %>% 
+  slice(10) %>% 
+  select(Vitamin_C, depth) %>% 
+  ungroup() %>% 
+  # Finding the maximum sampling depth to retain 10 samples in each group
+  summarize(final_depth = min(depth)) %>%
+  pull(final_depth) %>% 
+  print()
+```
+## Alpha Diversity
+```{r}
+psrare = ps_jeremy_data %>% 
+  rarefy_even_depth(sample.size = 9555)
+table(sample_sums(psrare))
+p = plot_richness(psrare, x = 'Vitamin_C',
+                  measures = c ('Shannon'),
+                  color = 'Vitamin_C',)
+pdata = p$data
+p_formatted <- pdata %>% 
+  ggplot(aes(Vitamin_C, value, fill = Vitamin_C)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(height = 0, width = 0.2) +
+  theme_classic(base_size = 12)+
+  labs(x = 'Vitamin C Intake Levels', 
+       y = 'Shannon Diversity', 
+       fill = 'Vitamin C \n Intake Levles')
+print(p_formatted)
+
+
+# Statistical tests
+comparison = list( c('Low', 'Typical'),
+                   c('Low', 'High'),
+                   c('Typical', 'High'))
+
+p_formatted + 
+  stat_compare_means(comparisons = comparison, method = 'wilcox.test', size = 6)+
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2)))
+```

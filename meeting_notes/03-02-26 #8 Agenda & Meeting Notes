@@ -1,7 +1,7 @@
 Agenda:
 > Can we reference the reader to go to GitHub for more specifications (ex, data classification binning details like actual numbers)
 
-Reworded Aims to get approved by:
+Reworded Aims to get approved:
 1. Identify dietary antioxidants that correlate with microbiome diversity most significantly.
     -> Supported with statistical testing using ANOVA/ Kruskal-Wallis test and Bray-Curtis dissimilarity using PERMANOVA
 2. Identify indicator taxa and taxa that are differentially abundant in the microbiomes of Parkinson’s Disease patients grouped by antioxidant stratified levels of high, medium, or low.

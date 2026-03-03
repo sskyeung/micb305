@@ -10,3 +10,36 @@ Reworded Aims to get approved:
     -> **do we want to include picrust2 in the actual aim or leave it for the description below it.
 4. Investigate the capability of antioxidant intake levels to predict Parkinson’s Disease age of onset using a Random Forest Model.
 
+Agenda:
+> Can we reference the reader to go to GitHub for more specifications (ex, data classification binning details like actual numbers)
+
+Reworded Aims to get approved:
+1. Identify dietary antioxidants that correlate with microbiome diversity most significantly.
+    -> Supported with statistical testing using ANOVA/ Kruskal-Wallis test and Bray-Curtis dissimilarity using PERMANOVA
+2. Identify indicator taxa and taxa that are differentially abundant in the microbiomes of Parkinson’s Disease patients grouped by antioxidant stratified levels of high, medium, or low.
+    -> This will pinpoint the antioxidant condition that impacts the microbial composition
+3. Investigate the relationship between the functional pathways influenced by antioxidant-associated microbes and Parkinson’s Disease age of onset using PICRUSt2.
+    -> **do we want to include picrust2 in the actual aim or leave it for the description below it.
+4. Investigate the capability of antioxidant intake levels to predict Parkinson’s Disease age of onset using a Random Forest Model.
+
+
+Meeting Notes:
+- We should explore the random forest model for either a continuous or a multi-group model for our Parkinson's data
+- For differential abundance: it's fine to just go with what we already have, it's fine to have anything that isnt statistcially significant.
+   -> Check the adjusted p-value
+- Reworded aims:
+ 3. Adding parkinsons disease age of onset will make it too complex of an aim. Current aim 3 is more for the discussion. 
+    -> Identify the functional pathway influenced by the antioxidant intake. <- Better aim and we can leave the picrust2 for the description.
+4. For the random forest aim, see if we can structure more as can we use antioxidant associated microbial markers to predict Parkinson's age of onset 
+using a Random Forest Model. 
+
+
+Use ALDEx2 for the functional analysis
+
+For random forest model: we should change the min.node.size to fit our data. 
+
+For the proposal, we should try to over-explain rather than under-explain. 
+   -> we can try swapping our proposal with other groups to make sure our proposal makes logical sense to those who aren't knowledgeable with
+      this topic. 
+
+

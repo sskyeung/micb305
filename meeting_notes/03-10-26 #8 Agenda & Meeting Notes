@@ -1,7 +1,15 @@
 Agenda:
 Go over parts of the proposal
   > Intro
+    - Title: be more specific  with either diversity, function and whatnot
+    - Cite references properly
+    - Climbing ability? specifically state motor function 
+    - Remove abbreviations if you are not using them repeatedly.
   > Hypothesis and prediction
-  > Experimental aims 
+  > Experimental aims:
+    - Relate more to physiology
+    - explain not why, but simply describe more about what the specific choice of test does (ex: shanonon and bray curtis)
+    - for beta diversity how calculate distances how analysing it and how plotting with elipses
   > Proposed approach
     >> avril new function for picrust2 error bar plot, how to site
+    -

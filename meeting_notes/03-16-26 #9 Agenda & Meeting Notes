@@ -13,3 +13,6 @@ Concerns:
   > Got different result for Beta diversity. Different significant p adjusted value. 
   > Alpha diversity showed no significance. 
   > MetaCyc vs Kegg
+  > Clarification on adjusting the p values for false dicovery rate (multiple testing correction) 
+
+  

@@ -17,4 +17,41 @@ Concerns:
   > MetaCyc vs Kegg
   > Clarification on adjusting the p values for false dicovery rate (multiple testing correction) 
 
-  
+
+
+Meeting notes: 
+- use affinity (more professional, vector-based) or powerpoint (easier) to customize figures 
+- Importance graph can be included (how much importance value adds to the story?, if not that important, 
+  include in supplmentle figure), even if model has weak predictive power
+- Adding p values to alpha diversity plots: use wilcoxon test. (ANOVA or kruskal walis) -> follow up with post-hoc test
+  -> manually add significance (only add when it is significant)
+- chceck the documentation for ANCOMBC 2 (look under alpha to change p value cut off ) 
+  ANCOMBC2 use pariwise comparison 
+- use LinDA for functional analysis 
+- stat value 0.7 cutoff can be adjusted
+- explain why you are discussing it even if stats value are not above cutoff 
+- plot the taxa individually in boxplot (similar to random forest) -> see how much of the gut microbiota actually made up
+  use boxplot from random forest (we already have the code, after the importance value, adapt that for interesting indicator taxa, 
+  keep in mind normalizing method)
+- for random forest: both numerical and multigroup (2+) doable for random forest
+- 0.09 is close enough, to rationalize, 'trending towards significance'
+- more important to explain 'why you did do something', doesn't hurt to explain 'why you didn't do', could talk about it briefly in limitation
+- explain biologically what results mean (more important)
+- expect 1 figure per aim, can include non significant results
+- combine alpha and beta diversity into one multi-panel plot 
+"Non significnat results are results!"
+
+Remaining assingments:
+- presentation
+  - first week of April
+  - randomly assigning when to present 
+  - Q and A: answer question on the discussion board
+  - 1 question per person 
+  - don't read off a script 
+  - cards with point forms are allowed 
+- manuscript
+
+Expectation before next meeting:
+- slides for presentation 
+  - reference needed on the slide 
+- start writing up the methods 

@@ -11,7 +11,7 @@ Concerns:
   > Ran Functional analysis. Decreased pathways in high antioxidant groups relative to low. Opposite to what we expected. 
   > Only LinDA showed significance. Lowest p adjusted value for MaAsLin and AlDeX2 around 0.11. 
   > Got different result for Beta diversity. Different significant p adjusted value. 
-  > Alpha diversity showed no significance. 
+  > Alpha diversity showed no significance (before adjusting for false discovery). 
   > MetaCyc vs Kegg
   > Clarification on adjusting the p values for false dicovery rate (multiple testing correction) 
 

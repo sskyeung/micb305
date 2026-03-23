@@ -6,5 +6,5 @@ Expectation before next meeting:
 Agenda:
   > Slides for presentation:
     > https://ubcca-my.sharepoint.com/:p:/g/personal/rmurata_student_ubc_ca/IQAQyVowzAj7TJEQHWp4Q4cEAaxBaiYWOCawLBpLfkEuQBk?e=JhNsAe
-  > No significant antioxidant was found after doing beta diversity. 
+  > No significant antioxidant was found after adjusting p value for beta diversity. 
   > Figure out Numerical Random Forest (managed to step by step work my way into making one that factors 2+ outcomes, but cannot use probability to make ROC curve)

@@ -13,3 +13,49 @@ Agenda:
   > can we disregard robustness (structural zero) and only use q (p_adjusted value)?
   > are there any other p_adj_method?
 
+Meeting Notes:
+
+> Title: Change the title to make it specific for effects of Vitamin C.
+
+> Aim 1:
+  > Alpha diversity: filter out control
+    > Don't need alpha diversity for other antioxidants except VitC.
+  > Beta diversity: say we saw some trends and is why we moved on with VitC but don't use as conclusion. Also say that after adjusting the p-values, none were significant.
+    > make bray curtis for each antioxidant to show that only vitC is significant before adjusting p-values.
+    > export graphs without p-values, then add p-value and p-value adjusted manually in PowerPoint.
+  > Figure 1: Bar plot (R-squared), Beta diversity for VitC, alpha diversity for VitC, then rest in supplementary.
+
+> Aim 2:
+  > Differential abundance: ANCOMBC:
+    > if you are going to ignore the sensitivity thing(Past SS?), you need to address it in the manuscript.
+    > 5 significant taxa - is great to talk about - do box plots (add in typical group)
+  > Indicator taxa:
+    > If above 0.7, it indicates a good indicator.
+    > If you're going to lower it to 0.5, make box plots that go in supplementary.
+    > p-adjusted: don't need to do because it says so in the package.
+  > Figure 2: 
+    > Differential abundance - Do a facet box plot separated with each taxa and within each taxa plot add high, typical, and low intake levels.
+  > Table 1:
+    > Indicator taxa
+      > Can do a table (adjusted p-value, set values)
+
+> Aim 3: 
+  > MetaCyc:
+    > Kyle's graph looks good - don't need to include typical intake
+    > Font size - look into the updated version of ggpicrust
+  > Random forest:
+    > Avril will push new code to Github tomorrow (Mar. 24)
+    > Run around 8 
+  > Figure 3: 
+    > pca plot is supplementary
+    > picrust is main figure
+    > random forest 
+
+> colour of plots should be consistent
+
+> For next week:
+  > plots
+  > aim 4
+  > last meeting is easter
+  
+

@@ -1,0 +1,129 @@
+---
+title: "differential_abundance_v2"
+output: html_document
+date: "2026-03-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Loading Library
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+library(writexl)
+library(ANCOMBC)
+library(ggpubr)
+library(patchwork)
+library(ggsignif)
+```
+
+```{r}
+ps_vc = readRDS('phyloseq.rds')
+set.seed(421)
+ps_genus_vc = tax_glom(ps_vc, 'Genus')
+output_genus_vc = ancombc2( ps_genus_vc,
+          fix_formula = "Vitamin_C",
+          p_adj_method = "BH",
+          prv_cut = 0.1 )
+
+
+sig_taxa_asv = output_genus_vc$res %>% 
+  filter(q_Vitamin_CLow < 0.05) %>% 
+  select(taxon) %>% 
+  pull()
+
+tax_df = as.data.frame(tax_table(ps_vc)) %>% 
+  rownames_to_column(var = 'taxon') %>% 
+  filter(taxon %in% sig_taxa_asv)
+
+vc_daa_sig = output_genus_vc$res %>% 
+  filter(q_Vitamin_CLow < 0.05) %>% 
+  full_join(tax_df, by = 'taxon') %>% 
+  select(taxon, lfc_Vitamin_CLow, q_Vitamin_CLow, Genus) %>% 
+  mutate(lfc_Vitamin_CHigh = -lfc_Vitamin_CLow) %>% 
+  arrange(lfc_Vitamin_CHigh)%>% 
+  mutate(q_label = sprintf('%.3f', q_Vitamin_CLow)) 
+#l2fd data currently uses high intake group as reference
+```
+
+
+```{r}
+ps_vc_rel = transform_sample_counts(ps_vc, function(x) x/ sum(x))
+ps_vc_sig = prune_taxa(sig_taxa_asv, ps_vc_rel)
+daa_data = psmelt(ps_vc_sig) %>% 
+  filter(Vitamin_C == 'Low'| Vitamin_C == 'typical' | Vitamin_C == "High")
+
+daa_data$Genus = factor(daa_data$Genus, levels = vc_daa_sig$Genus)
+vc_daa_sig$Genus = factor(vc_daa_sig$Genus, levels = vc_daa_sig$Genus)
+daa_data$Vitamin_C = factor(daa_data$Vitamin_C, levels = c('High', 'typical', 'Low'))
+
+daa_boxplot = ggplot(daa_data, aes(y = Genus, x = Abundance, fill = Vitamin_C)) +
+  geom_boxplot(outlier.shape = NA)+
+  coord_cartesian(xlim = c(0, 0.04))+
+  scale_fill_manual(values = c('High' = 'red', 'Low' = 'blue', 'typical' = 'green'))+
+  labs(x = 'Relative Abundance (%)', y = 'Genus')+
+  theme_minimal()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line.x = element_line(colour = 'black'))
+
+daa_lfc = ggplot(vc_daa_sig, aes(y = Genus, x = lfc_Vitamin_CHigh)) + 
+  geom_bar(stat = 'identity') +
+  geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
+  labs(x = 'Log2 Fold change', y = NULL)+ 
+  theme_minimal()+
+  theme(axis.text.y = element_blank())+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line.x = element_line(colour = 'black'))
+
+daa_qval = ggplot(vc_daa_sig, aes(y = Genus, x = 1)) +
+  geom_text(aes(label = q_label), size = 3.5) +
+  scale_y_discrete(position = 'right')+
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = 'P value (Adjusted)', x = NULL)+
+  theme_void()+
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_blank(),
+    axis.text.y = element_blank(),
+    axis.title.y.right = element_text(size = 9, face = 'bold', angle = -90, vjust = 0.5),
+    plot.margin = margin(l =2, r = 2)
+  )
+
+daa_combined = (daa_boxplot | daa_lfc | daa_qval) + 
+  plot_layout (widths = c(3, 1, 0.7), guides = 'collect') & theme(legend.position = 'right')
+ggsave("daa_plot_v2.png",
+       plot = daa_combined, width = 18, height = 10)
+
+daa_combined
+```
+
+```{r}
+daa_facet = ggplot(daa_data,
+                   aes(x = Vitamin_C,
+                       y = Abundance,
+                       fill = Vitamin_C))+
+  geom_boxplot(outlier.shape = NA)+
+  scale_fill_manual(values = c('High' = 'red', 'Low' = 'blue', 'typical' = 'green'))+
+  facet_wrap(~Genus, scales = 'free', ncol = 3)+
+  labs(x = 'Vitamin C Intake', y = 'Relative Abundance (%)')+
+  theme_minimal()+
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = 'black'),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = 'none',
+    strip.text = element_text(face = 'italic'))
+
+daa_facet
+ggsave("daa_facet_v1.png",
+       plot = daa_facet, width = 18, height = 10)
+```

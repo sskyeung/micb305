@@ -1,5 +1,7 @@
 ```{r Phyloseq}
-set.seed(421)
+
+metadata = read.delim('parkinsons_metadata 2.txt', header = TRUE, row.names = 1) 
+metadata_PD = subset(metadata, Disease == "PD")
 taxonomy = read.delim('taxonomy.tsv', header = TRUE, row.names = "Feature.ID" ) # from qiime2
 counts = read.delim('table.txt', skip=1, row.names=1)  # from qiime2
 tree = read_tree('tree.nwk')
@@ -8,19 +10,31 @@ taxonomy_formatted = taxonomy %>%
   separate(col= Taxon,
            into = c('Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'),
            sep = '; ', fill = 'right') %>%
-  select(-Confidence) %>%
+  select(-Confidence) %>% 
   as.matrix()
 
 counts_formatted = as.matrix(counts)
 
-ps <- phyloseq(sample_data(PD_binned),
+PD_sum = metadata_PD|>
+  group_by(Sex) |>
+  summarise(  
+    p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
+    p66_Vitamin_C = quantile(Vitamin_C, 0.67, na.rm = TRUE))
+
+PD_grouped = metadata_PD %>% 
+  mutate(Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "typical",
+                     Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "typical")) %>%
+  drop_na(Vitamin_C, Age_onset)
+
+ps <- phyloseq(sample_data(PD_grouped),
                otu_table(counts_formatted, taxa_are_rows = T),
                tax_table(taxonomy_formatted),
                tree)
-
-ps_genus = tax_glom(ps,'Genus')
-ps_relab = transform(ps_genus, 'compositional')
-ps_filt = filter_taxa(ps_relab, function(x) mean(x) > 0.0001, TRUE)
-otu_table = data.frame(otu_table(ps_filt))
+ps_genus = tax_glom(ps,"Genus")
 
 ```

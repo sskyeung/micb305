@@ -1,4 +1,6 @@
 Agenda:
->
-
+>Questions:
+>>Aim 4 (Random Forest)
+- should importance plot be included in manuscript? if yes - which error/residuals plot should we also add? which should be added to supplemental?
+- currently we think we should also keep QQ plot and RMSE fold comparisons plot since they outline fitness and relative predictive power of model
 Concerns:

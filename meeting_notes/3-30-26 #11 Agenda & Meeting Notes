@@ -12,3 +12,5 @@ The relative abundance graph is showing a thin boxplot for 4 of the 5 genus. (gr
 - should importance plot be included in manuscript? if yes - which error/residuals plot should we also add? which should be added to supplemental?
 - currently we think we should also keep QQ plot and RMSE fold comparisons plot since they outline fitness and relative predictive power of model
 
+Meeting:
+>

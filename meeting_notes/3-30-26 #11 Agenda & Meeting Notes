@@ -22,5 +22,12 @@ Meeting:
   > Question is good 
   > Hypothesis is a bit plain - use transitions between predictions - maybe switch order of hypothesis and question
   > Dataset Background - og study looked at this... + size + dont go into detail on time and place + last part is good - make slide shorter (just say around 200 pd patients and thats we will focus on)
-  > Aim 1 - split into multiple slides- talk about R2 first - then second slide on alpha and beta diversity + REMOVE TITLES FROM FIGURES - text size in plots is also quite small
-  > Aim 2- tiny text on the plots 
+  > Aim 1: split into multiple slides- talk about R2 first - then second slide on alpha and beta diversity + REMOVE TITLES FROM FIGURES - text size in plots is also quite small
+  > Aim 2: tiny text on the plots escheria shigella are 2 diff taxa - for indicator taxa - a bit confused by his advice but i think jeremy understood
+         - for differential abundance -> keep outliers, issue with prevalence in the dataset (point prevalence filter) sicne there is no diff between the groups, dont need to include all analyses
+  >Aim 3: slide 9 can be deleted because its addressed later - make title more specific - what kind of functionnal shift? - dont need to go into so much detail into statistical model
+   - dont talk about significance for pca plot, u could run PERMANOVA to get distance matrix
+  >Aim 4: again, take out titles + dont include all plots (include predicted vs actual but u will have to explain in more detail) - what is dotted line vs red line - say its not very predictive (slopes are v different) - no predictive power 
+          - dont talk about important features because no predicitve power
+  >Conclusion: increase text size but good
+  >Future Directions: good - murine vitamin c knockout - and go into more detail on what to propose

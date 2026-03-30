@@ -13,4 +13,14 @@ The relative abundance graph is showing a thin boxplot for 4 of the 5 genus. (gr
 - currently we think we should also keep QQ plot and RMSE fold comparisons plot since they outline fitness and relative predictive power of model
 
 Meeting:
->
+>Presentation
+>> presentation 12 mins - too long
+  >Title - be more specific about results
+  >Intro - separate: slide on parkinsons, slide on antioxidants
+         - remove sexe differences stuff
+  > Microbiome - phrase it differently - make knowledge gap bigger - USE ANIMATIONS
+  > Question is good 
+  > Hypothesis is a bit plain - use transitions between predictions - maybe switch order of hypothesis and question
+  > Dataset Background - og study looked at this... + size + dont go into detail on time and place + last part is good - make slide shorter (just say around 200 pd patients and thats we will focus on)
+  > Aim 1 - split into multiple slides- talk about R2 first - then second slide on alpha and beta diversity + REMOVE TITLES FROM FIGURES - text size in plots is also quite small
+  > Aim 2- tiny text on the plots 

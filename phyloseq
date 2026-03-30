@@ -25,10 +25,10 @@ PD_grouped = metadata_PD %>%
   mutate(Vitamin_C =
            case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
                      Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
-                     Sex == "Male" & Vitamin_C ~ "typical",
+                     Sex == "Male" & Vitamin_C ~ "Typical",
                      Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
                      Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
-                     Sex == "Female" & Vitamin_C ~ "typical")) %>%
+                     Sex == "Female" & Vitamin_C ~ "Typical")) %>%
   drop_na(Vitamin_C, Age_onset)
 
 ps <- phyloseq(sample_data(PD_grouped),

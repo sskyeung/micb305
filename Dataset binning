@@ -18,7 +18,7 @@ PD_sum = metadata_PD |>
     p33_Vitamin_A = quantile(Vitamin_A, 0.33, na.rm = TRUE),
     p66_Vitamin_A = quantile(Vitamin_A, 0.66, na.rm = TRUE),
     p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
-    p66_Vitamin_C = quantile(Vitamin_C, 0.66, na.rm = TRUE),
+    p66_Vitamin_C = quantile(Vitamin_C, 0.67, na.rm = TRUE),
     p33_Vitamin_E = quantile(Vitamin_E, 0.33, na.rm = TRUE),
     p66_Vitamin_E = quantile(Vitamin_E, 0.66, na.rm = TRUE),
     p33_Car_total = quantile(Carotene_total, 0.33, na.rm = TRUE),
@@ -78,12 +78,12 @@ PD_binned = PD_grouped |>
                      Sex == "Female" & Vitamin_A < 223.012 ~ "Low",
                      Sex == "Female" & Vitamin_A ~ "Typical"),
          Vitamin_C =
-           case_when(Sex == "Male" & Vitamin_C > 117.5009 ~ "High",
+           case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
                      Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
-                     Sex == "Male" & Vitamin_C ~ "Typical",
-                     Sex == "Female" & Vitamin_C > 162.6396 ~ "High",
+                     Sex == "Male" & Vitamin_C ~ "typical",
+                     Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
                      Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
-                     Sex == "Female" & Vitamin_C ~ "Typical"),
+                     Sex == "Female" & Vitamin_C ~ "typical")),
          Vitamin_E =
            case_when(Sex == "Male" & Vitamin_E > 12.08046 ~ "High",
                      Sex == "Male" & Vitamin_E < 8.652149 ~ "Low",
@@ -150,3 +150,40 @@ Car_total_count = PD_binned |>
   count(Carotene_total) |>
   drop_na()
 ```
+
+metadata = read.delim('parkinsons_metadata 2.txt', header = TRUE, row.names = 1) 
+metadata_PD = subset(metadata, Disease == "PD")
+taxonomy = read.delim('taxonomy.tsv', header = TRUE, row.names = "Feature.ID" ) # from qiime2
+counts = read.delim('table.txt', skip=1, row.names=1)  # from qiime2
+tree = read_tree('tree.nwk')
+
+taxonomy_formatted = taxonomy %>%
+  separate(col= Taxon,
+           into = c('Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'),
+           sep = '; ', fill = 'right') %>%
+  select(-Confidence) %>% 
+  as.matrix()
+
+counts_formatted = as.matrix(counts)
+
+PD_sum = metadata_PD|>
+  group_by(Sex) |>
+  summarise(  
+    p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
+    p66_Vitamin_C = quantile(Vitamin_C, 0.67, na.rm = TRUE))
+
+PD_grouped = metadata_PD %>% 
+  mutate(Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "typical",
+                     Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "typical")) %>%
+  drop_na(Vitamin_C, Age_onset)
+
+ps <- phyloseq(sample_data(PD_grouped),
+               otu_table(counts_formatted, taxa_are_rows = T),
+               tax_table(taxonomy_formatted),
+               tree)
+ps_genus = tax_glom(ps,"Genus")

@@ -1,0 +1,358 @@
+library(phyloseq)
+library(tidyverse)
+library(vegan)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+metadata = read.delim('project_data/parkinsons_metadata_2.txt', header = TRUE, row.names = 1)
+metadata_PD <- subset(metadata, Disease == "PD")
+
+##33rd and 66th percentile, sd values created too large sample pool of in between and too small of extreme ends
+PD_sum = metadata_PD |>
+  group_by(Sex) |>
+  summarise(
+    p33_alpha_carotene = quantile(Alpha_carotene, 0.33, na.rm = TRUE),
+    p67_alpha_carotene = quantile(Alpha_carotene, 0.67, na.rm = TRUE),
+    p33_beta_carotene = quantile(Beta_carotene, 0.33, na.rm = TRUE),
+    p67_beta_carotene = quantile(Beta_carotene, 0.67, na.rm = TRUE),
+    p33_Copper = quantile(Copper, 0.33, na.rm = TRUE),
+    p67_Copper = quantile(Copper, 0.67, na.rm = TRUE),
+    p33_selenium = quantile(Selenium, 0.33, na.rm = TRUE),
+    p67_selenium = quantile(Selenium, 0.67, na.rm = TRUE),
+    p33_Vitamin_A = quantile(Vitamin_A, 0.33, na.rm = TRUE),
+    p67_Vitamin_A = quantile(Vitamin_A, 0.67, na.rm = TRUE),
+    p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
+    p67_Vitamin_C = quantile(Vitamin_C, 0.67, na.rm = TRUE),
+    p33_Vitamin_E = quantile(Vitamin_E, 0.33, na.rm = TRUE),
+    p67_Vitamin_E = quantile(Vitamin_E, 0.67, na.rm = TRUE),
+    p33_Car_total = quantile(Carotene_total, 0.33, na.rm = TRUE),
+    p67_Car_total = quantile(Carotene_total, 0.67, na.rm = TRUE))
+
+PD_grouped = metadata_PD %>% 
+  mutate(Age_onset =
+           case_when(Age_onset  < 50 ~ "40s",
+                     between(Age_onset, 50, 59) ~ "50s",
+                     between(Age_onset, 60, 69) ~ "60s",
+                     Age_onset >= 70 ~ "70s"))
+
+#PD_male_grouped <- subset(metadata_PD, Sex == "Male")  == 122 patients
+#PD_female_grouped <- subset(metadata_PD, Sex == "Female") == 75 patients
+
+PD_binned = PD_grouped |>
+  mutate(Alpha_carotene =
+           case_when(Sex == "Male" & Alpha_carotene > 548.2559 ~ "High",
+                     Sex == "Male" & Alpha_carotene < 189.350 ~ "Low",
+                     Sex == "Male" & Alpha_carotene ~ "Typical",
+                     Sex == "Female" & Alpha_carotene > 575.7513 ~ "High",
+                     Sex == "Female" & Alpha_carotene < 541.904 ~ "Low",
+                     Sex == "Female" & Alpha_carotene ~ "Typical"),
+         Beta_carotene = 
+           case_when(Sex == "Male" & Beta_carotene > 3542.550 ~ "High",
+                     Sex == "Male" & Beta_carotene < 2229.975 ~ "Low",
+                     Sex == "Male" & Beta_carotene ~ "Typical",
+                     Sex == "Female" & Beta_carotene > 5100.328 ~ "High",
+                     Sex == "Female" & Beta_carotene < 3178.988 ~ "Low",
+                     Sex == "Female" & Beta_carotene ~ "Typical"),
+         Copper = 
+           case_when(Sex == "Male" & Copper > 1.2 ~ "High",
+                     Sex == "Male" & Copper < 0.8431575 ~ "Low",
+                     Sex == "Male" & Copper ~ "Typical",
+                     Sex == "Female" & Copper > 1.285575 ~ "High",
+                     Sex == "Female" & Copper < 1 ~ "Low",
+                     Sex == "Female" & Copper ~ "Typical"),
+         Selenium = 
+           case_when(Sex == "Male" & Selenium > 58.39314 ~ "High",
+                     Sex == "Male" & Selenium < 42.72238 ~ "Low",
+                     Sex == "Male" & Selenium ~ "Typical",
+                     Sex == "Female" & Selenium > 65.45464 ~ "High",
+                     Sex == "Female" & Selenium < 44.83593 ~ "Low",
+                     Sex == "Female" & Selenium ~ "Typical"),
+         Vitamin_A =
+           case_when(Sex == "Male" & Vitamin_A > 328.4200 ~ "High",
+                     Sex == "Male" & Vitamin_A < 191.623 ~ "Low",
+                     Sex == "Male" & Vitamin_A ~ "Typical",
+                     Sex == "Female" & Vitamin_A > 419.0756 ~ "High",
+                     Sex == "Female" & Vitamin_A < 223.012 ~ "Low",
+                     Sex == "Female" & Vitamin_A ~ "Typical"),
+         Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "Typical",
+                     Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "Typical"),
+         Vitamin_E =
+           case_when(Sex == "Male" & Vitamin_E > 12.09911 ~ "High",
+                     Sex == "Male" & Vitamin_E < 8.652149 ~ "Low",
+                     Sex == "Male" & Vitamin_E ~ "Typical",
+                     Sex == "Female" & Vitamin_E > 14.34675 ~ "High",
+                     Sex == "Female" & Vitamin_E < 10.580000 ~ "Low",
+                     Sex == "Female" & Vitamin_E ~ "Typical"),
+         Carotene_total =
+           case_when(Sex == "Male" & Carotene_total > 4064.849 ~ "High",
+                     Sex == "Male" & Carotene_total < 2495.81 ~ "Low",
+                     Sex == "Male" & Carotene_total ~ "Typical",
+                     Sex == "Female" & Carotene_total > 5691.588 ~ "High",
+                     Sex == "Female" & Carotene_total < 3636.83 ~ "Low",
+                     Sex == "Female" & Carotene_total ~ "Typical"))
+
+```
+
+
+make phyloseq object
+```{r}
+taxonomy = read.delim('project_data/taxonomy.tsv', row.names = 1) # from qiime2
+counts = read.delim('project_data/feature-table.txt', skip=1, row.names=1)  # from qiime2
+tree = read_tree("project_data/tree.nwk")
+
+taxonomy_formatted = taxonomy %>%
+  separate(col = Taxon,
+           into = c("Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species"),
+           sep = ";", fill = "right") %>%
+  select(-Confidence) %>%
+  as.matrix()
+
+counts_formatted = counts %>%
+  as.matrix()
+
+#rownames(PD_binned) <- PD_binned$X.SampleID
+
+ps = phyloseq(sample_data(PD_binned),
+              otu_table(counts_formatted, taxa_are_rows = TRUE),
+              tax_table(taxonomy_formatted), tree)
+
+saveRDS(ps, "project_data/phyloseq_taxonomy_binned.rds")
+
+```
+
+
+
+```{r beta diversity}
+###VIT C BETA DIVERSITY GRAPH CODE###
+
+set.seed(421)
+psrare = ps %>% rarefy_even_depth(sample.size = 9555, rngseed = 421) # 66 samples removed for being lower than sample size
+
+#ps_bray = phyloseq::distance(psrare, method = "bray")
+
+ps_vitC <- subset_samples(psrare, !is.na(Vitamin_C))
+
+ps_bray <- phyloseq::distance(ps_vitC, method = "bray")
+
+vitc_metadata <- sample_data(ps_vitC) %>% data.frame()
+
+Vit_C_stats_univar <- adonis2(ps_bray ~ Vitamin_C, data = vitc_metadata)
+
+#PMA_metadata = sample_data(psrare) %>% data.frame() 
+
+#Vit_C_stats_univar = adonis2(ps_bray ~ Vitamin_C, data = PMA_metadata)
+
+# Combine into a table
+Vit_C_stats = bind_rows('Univariate' = Vit_C_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Vit_C_stats = Vit_C_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Vit_C_stats 
+
+mds = metaMDS(ps_bray)
+
+mds_data_vitC = mds$points %>% as.data.frame %>%
+  merge(sample_data(ps_vitC), by='row.names', sort=F)
+head(mds_data_vitC)
+
+p_vitC = mds_data_vitC %>%
+  ggplot(aes(MDS1,MDS2,color = Vitamin_C, shape = Vitamin_C)) +
+  geom_point() +
+  stat_ellipse() +
+  labs(title= str_wrap('Bray-Curtis Beta Diversity Across Vitamin C Intake Groups', width = 50)) + 
+  scale_color_manual(name = "Vitamin C Intake", values = c("High" = "#F5793A", "Low" = "#E03C8A", "Typical" = "#005AB5")) +
+  scale_shape_manual(name = "Vitamin C Intake", values = c("High" = 16, "Low" = 17, "Typical" = 15))+
+  theme_classic(base_size=15) +
+  theme(plot.title = element_text(hjust = 0.5))
+p_vitC
+
+ggsave("beta_diversity_vitC.png",
+       p_vitC,
+       width = 8,
+       height = 5,
+       dpi = 300)
+
+```{r Alpha}
+ps_alpha <- subset_samples(psrare, !is.na(Alpha_carotene))
+
+ps_bray <- phyloseq::distance(ps_alpha, method = "bray")
+
+alpha_metadata <- sample_data(ps_alpha) %>% data.frame()
+
+Alpha_stats_univar = adonis2(ps_bray ~ Alpha_carotene, data = alpha_metadata)
+
+# Combine into a table
+Alpha_stats = bind_rows('Univariate' = Alpha_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Alpha_stats = Alpha_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Alpha_stats 
+
+```
+```{r beta}
+ps_beta <- subset_samples(psrare, !is.na(Beta_carotene))
+
+ps_bray <- phyloseq::distance(ps_beta, method = "bray")
+
+beta_metadata <- sample_data(ps_beta) %>% data.frame()
+
+Beta_stats_univar = adonis2(ps_bray ~ Beta_carotene, data = beta_metadata)
+
+# Combine into a table
+Beta_stats = bind_rows('Univariate' = Beta_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Beta_stats = Beta_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Beta_stats 
+
+```
+```{r Total}
+ps_total <- subset_samples(psrare, !is.na(Carotene_total))
+
+ps_bray <- phyloseq::distance(ps_total, method = "bray")
+
+total_metadata <- sample_data(ps_total) %>% data.frame()
+Total_stats_univar = adonis2(ps_bray ~ Carotene_total, data = total_metadata)
+
+# Combine into a table
+Total_stats = bind_rows('Univariate' = Total_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Total_stats = Total_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Total_stats 
+
+```
+```{r Copper}
+ps_copper <- subset_samples(psrare, !is.na(Copper))
+
+ps_bray <- phyloseq::distance(ps_copper, method = "bray")
+
+copper_metadata <- sample_data(ps_copper) %>% data.frame()
+Copper_stats_univar = adonis2(ps_bray ~ Copper, data = copper_metadata)
+
+# Combine into a table
+Copper_stats = bind_rows('Univariate' = Copper_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Copper_stats = Copper_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Copper_stats 
+
+```
+
+```{r Selenium}
+ps_selenium <- subset_samples(psrare, !is.na(Selenium))
+
+ps_bray <- phyloseq::distance(ps_selenium, method = "bray")
+
+selenium_metadata <- sample_data(ps_selenium) %>% data.frame()
+Selenium_stats_univar = adonis2(ps_bray ~ Selenium, data = selenium_metadata)
+
+# Combine into a table
+Selenium_stats = bind_rows('Univariate' = Selenium_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Selenium_stats = Selenium_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Selenium_stats 
+
+```
+```{r Vitamin A}
+ps_vitA <- subset_samples(psrare, !is.na(Vitamin_A))
+
+ps_bray <- phyloseq::distance(ps_vitA, method = "bray")
+
+vitA_metadata <- sample_data(ps_vitA) %>% data.frame()
+
+Vit_A_stats_univar = adonis2(ps_bray ~ Vitamin_A, data = vitA_metadata)
+
+# Combine into a table
+Vit_A_stats = bind_rows('Univariate' = Vit_A_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Vit_A_stats = Vit_A_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Vit_A_stats 
+
+```
+```{r Vitamin E}
+ps_vitE <- subset_samples(psrare, !is.na(Vitamin_E))
+
+ps_bray <- phyloseq::distance(ps_vitE, method = "bray")
+
+vitE_metadata <- sample_data(ps_vitE) %>% data.frame()
+Vit_E_stats_univar = adonis2(ps_bray ~ Vitamin_E, data = vitE_metadata)
+
+# Combine into a table
+Vit_E_stats = bind_rows('Univariate' = Vit_E_stats_univar %>% as.data.frame() %>% 
+                    rownames_to_column('Variable'),
+                  .id = 'Model') # First column is Model, either Uni or Multi
+
+Vit_E_stats = Vit_E_stats %>% rename(Pval = `Pr(>F)`) %>%
+  filter(!is.na(Pval))
+
+Vit_E_stats 
+
+```
+```{r}
+
+###BAR PLOT CODE###
+
+results <- tibble(
+  Variable = c("Alpha_carotene","Beta_carotene","Carotene_total","Copper",
+               "Selenium","Vitamin_A","Vitamin_C","Vitamin_E"),
+  Pval = c(
+    Alpha_stats$Pval,
+    Beta_stats$Pval,
+    Total_stats$Pval,
+    Copper_stats$Pval,
+    Selenium_stats$Pval,
+    Vit_A_stats$Pval,
+    Vit_C_stats$Pval,
+    Vit_E_stats$Pval
+  ),
+  R2 = c(Alpha_stats$R2,
+    Beta_stats$R2,
+    Total_stats$R2,
+    Copper_stats$R2,
+    Selenium_stats$R2,
+    Vit_A_stats$R2,
+    Vit_C_stats$R2,
+    Vit_E_stats$R2
+  )
+)
+
+results$Pval_adj <- p.adjust(results$Pval, method = "fdr")
+
+results_pvalue <- ggplot(data = results, aes(x = reorder(Variable, R2, decreasing = FALSE),y=R2, fill = Variable)) +
+  geom_bar(stat='identity') +
+  coord_flip() + 
+  labs(y = "Adonis R2", x = "Antioxidant", title = "Antioxidants Beta Diversity R2 Results")+
+  theme_classic(base_size = 15)+
+  theme(legend.position = "none")
+results_pvalue

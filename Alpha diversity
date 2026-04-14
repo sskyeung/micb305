@@ -1,0 +1,51 @@
+## Vitamin C
+
+```{r}
+psrare = ps_jeremy_data %>% rarefy_even_depth(sample.size = 9555, rngseed = 421)
+
+table(sample_sums(psrare))
+
+set.seed(421)
+p1 = plot_richness(psrare, x = 'Vitamin_C', 
+                  measures = c('Shannon'),
+                  color = 'Vitamin_C',
+                  )
+p1
+
+p1data = p1$data
+p1data
+
+vars <- c("Alpha_carotene","Beta_carotene","Copper","Selenium",
+          "Vitamin_A","Vitamin_C","Vitamin_E","Carotene_total")
+p1data <- p1$data %>%
+  dplyr::filter(!is.na(value)) %>% 
+  tidyr::drop_na(dplyr::all_of(vars))
+
+p1data
+
+p1data$Vitamin_C = factor(p1data$Vitamin_C, levels = c("Low", "Typical", "High"))
+
+
+alpha_plot <- ggplot(p1data, aes(x = Vitamin_C,
+                                        y = value)) +
+  stat_boxplot(geom = "errorbar", width = 0.2) +
+  geom_boxplot(aes(fill=Vitamin_C)) +
+  scale_fill_manual(values = c("High" = "#F5793A", "Low" = "#E03C8A", "Typical" = "#005AB5")) +
+  labs(x = "Vitamin C intake levels", y = "Shannon Diversity Measure") +
+  ylim(1, 7)  +
+  theme_classic(base_size = 22) +
+  theme(legend.position = "none")
+alpha_plot
+
+comparison = list( c('Low', 'Typical'),
+                   c('Low', 'High'),
+                   c('Typical', 'High'))
+
+alpha_plot_final = alpha_plot + 
+  stat_compare_means(comparisons = comparison, method = 'wilcox.test', size = 7)+
+  scale_y_continuous(expand = expansion(mult = c(0.06, 0.09)))
+alpha_plot_final
+
+ggsave('Alpha Diversity Vitamin C_1.jpeg',
+       plot = alpha_plot_final,
+       height= 5, width = 7)

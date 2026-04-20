@@ -1,6 +1,73 @@
 ## Vitamin C
 
 ```{r}
+PD_binned = PD_grouped |>
+  mutate(Alpha_carotene =
+           case_when(Sex == "Male" & Alpha_carotene > 548.2000 ~ "High",
+                     Sex == "Male" & Alpha_carotene < 189.350 ~ "Low",
+                     Sex == "Male" & Alpha_carotene ~ "Typical",
+                     Sex == "Female" & Alpha_carotene > 571.3539 ~ "High",
+                     Sex == "Female" & Alpha_carotene < 541.904 ~ "Low",
+                     Sex == "Female" & Alpha_carotene ~ "Typical"),
+         Beta_carotene = 
+           case_when(Sex == "Male" & Beta_carotene > 3522.162 ~ "High",
+                     Sex == "Male" & Beta_carotene < 2229.975 ~ "Low",
+                     Sex == "Male" & Beta_carotene ~ "Typical",
+                     Sex == "Female" & Beta_carotene > 4992.952 ~ "High",
+                     Sex == "Female" & Beta_carotene < 3178.988 ~ "Low",
+                     Sex == "Female" & Beta_carotene ~ "Typical"),
+         Copper = 
+           case_when(Sex == "Male" & Copper > 1.2 ~ "High",
+                     Sex == "Male" & Copper < 0.8431575 ~ "Low",
+                     Sex == "Male" & Copper ~ "Typical",
+                     Sex == "Female" & Copper > 1.276798 ~ "High",
+                     Sex == "Female" & Copper < 1 ~ "Low",
+                     Sex == "Female" & Copper ~ "Typical"),
+         Manganese = 
+           case_when(Sex == "Male" & Manganese > 3.088210 ~ "High",
+                     Sex == "Male" & Manganese < 2.43 ~ "Low",
+                     Sex == "Male" & Manganese ~ "Typical",
+                     Sex == "Female" & Manganese > 3.837956 ~ "High",
+                     Sex == "Female" & Manganese < 2.574287 ~ "Low",
+                     Sex == "Female" & Manganese ~ "Typical"),
+         Selenium = 
+           case_when(Sex == "Male" & Selenium > 58.29365 ~ "High",
+                     Sex == "Male" & Selenium < 42.72238 ~ "Low",
+                     Sex == "Male" & Selenium ~ "Typical",
+                     Sex == "Female" & Selenium > 65.14686 ~ "High",
+                     Sex == "Female" & Selenium < 44.83593 ~ "Low",
+                     Sex == "Female" & Selenium ~ "Typical"),
+         Vitamin_A =
+           case_when(Sex == "Male" & Vitamin_A > 311.4622 ~ "High",
+                     Sex == "Male" & Vitamin_A < 191.623 ~ "Low",
+                     Sex == "Male" & Vitamin_A ~ "Typical",
+                     Sex == "Female" & Vitamin_A > 408.9522 ~ "High",
+                     Sex == "Female" & Vitamin_A < 223.012 ~ "Low",
+                     Sex == "Female" & Vitamin_A ~ "Typical"),
+         Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "typical",
+                     Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "typical"),
+         Vitamin_E =
+           case_when(Sex == "Male" & Vitamin_E > 12.08046 ~ "High",
+                     Sex == "Male" & Vitamin_E < 8.652149 ~ "Low",
+                     Sex == "Male" & Vitamin_E ~ "Typical",
+                     Sex == "Female" & Vitamin_E > 14.09417 ~ "High",
+                     Sex == "Female" & Vitamin_E < 10.580000 ~ "Low",
+                     Sex == "Female" & Vitamin_E ~ "Typical"),
+         Carotene_total =
+           case_when(Sex == "Male" & Carotene_total > 3994.850 ~ "High",
+                     Sex == "Male" & Carotene_total < 2495.81 ~ "Low",
+                     Sex == "Male" & Carotene_total ~ "Typical",
+                     Sex == "Female" & Carotene_total > 5651.388 ~ "High",
+                     Sex == "Female" & Carotene_total < 3636.83 ~ "Low",
+                     Sex == "Female" & Carotene_total ~ "Typical"),)
+
+
+
 
 psrare = ps_jeremy_data %>% rarefy_even_depth(sample.size = 9555, rngseed = 421)
 

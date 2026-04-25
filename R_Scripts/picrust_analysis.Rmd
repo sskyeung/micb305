@@ -1,0 +1,182 @@
+---
+title: "assignment6"
+output: html_document
+date: "2026-02-28"
+---
+
+## Key information 
+
+Dataset: Parkinson's Disease
+
+Group of interest: Vitamin C intake levels (low vs high)
+
+Filtering:
+
+1) Keep only PD patients (Disease == 'PD')
+
+2) Filter out individuals with 'Typical' Vitamin C levels (keep 'Low' and 'High'). This categorization was done in previous assignments. 
+
+## Loading packages
+
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(ggpicrust2)
+library(Maaslin2)
+library(GGally)
+library(vegan)
+```
+
+# Vitamin C
+## Importing files
+
+```{r}
+# Phyloseq object from previous assignments
+
+meta = readRDS('phyloseq.rds') %>% 
+  .@sam_data %>% 
+  data.frame() %>% 
+  rownames_to_column('sample_name')
+path_abun = read.delim('path_abun_unstrat.tsv', row.names = 1)
+```
+
+## Filtering
+
+Phyloseq object imported above only contains patiens with PD. Controls are already filtered out. 
+
+The code below filters for extreme Vitamin C intake levels (Low and High). 
+```{r}
+meta_vitaminc = meta %>% 
+  filter(Vitamin_C %in% c("Low", "High"))
+path_abun_vitaminc = path_abun %>% 
+  select(all_of
+         (meta_vitaminc$sample_name))
+```
+
+## Differential Abundance Analysis using MaAsLin2 method
+
+```{r}
+daa_results_df = pathway_daa(abundance = path_abun_vitaminc,
+                             metadata = meta_vitaminc, 
+                             group = "Vitamin_C", 
+                             daa_method = "LinDA", 
+                             select = NULL, reference = NULL)
+
+daa_annotated_results_df = pathway_annotation(pathway = "MetaCyc",
+                                              daa_results_df = daa_results_df,
+                                              ko_to_kegg = FALSE) %>% 
+  rename(coeff = log2_fold_change)
+saveRDS(daa_annotated_results_df,'vitaminc_diff_abund_results_df.rds')
+
+```
+
+## Calculating Log 2 Fold Change 
+
+```{r}
+pathway_l2fc = path_abun_vitaminc %>% t() %>%
+  as.data.frame() %>%
+  mutate(Group = meta_vitaminc$Vitamin_C) %>%
+  group_by(Group) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>% 
+  as.data.frame() %>% 
+  setNames(.[1,]) %>% 
+  slice(-1) %>%
+  mutate(across(everything(), as.numeric)) %>% 
+  mutate(feature = rownames(.)) %>% 
+  mutate(log2_fold_change = log2(High/Low))
+
+daa_annotated_l2fc_df = daa_annotated_results_df %>% 
+  left_join(pathway_l2fc, by = 'feature')
+
+head(daa_annotated_l2fc_df)
+```
+
+## Filtering for pathways:
+- with adjusted P value of <0.05;
+- log 2 fold change cutoff of >=1
+```{r}
+daa_annotated_l2fc_df %>% 
+  filter(p_adjust < 0.05) %>% 
+  filter(abs(log2_fold_change) >= 1)
+```
+
+**Remove**
+There are no pathways that fit the above requirement. 
+There are no significant pathways.
+
+```{r}
+new_pthreshold = daa_annotated_l2fc_df %>%
+  arrange(p_adjust) %>% 
+  slice(3) %>% 
+  pull(p_adjust)
+
+print(paste("In order to have at least 3 significant pathways, adjusted P value threshold has to be moved to", new_pthreshold, '.'))
+```
+Filtering using the new p value threshold.
+**
+
+```{r}
+daa_annotated_filtered_df = daa_annotated_l2fc_df %>% 
+  filter(p_adjust < 0.05) %>% 
+  filter(abs(log2_fold_change) >= 1)  
+
+daa_annotated_filtered_df$description[daa_annotated_filtered_df$feature == "PWY-7873"] = "D-erythronate degradation II"
+
+daa_annotated_filtered_df$description[daa_annotated_filtered_df$feature == "PWY-7874"] = "L-threonate degradation"
+
+daa_annotated_filtered_df %>% 
+  select(feature, p_adjust, log2_fold_change) %>% 
+  print()
+```
+
+## Generating error bar plot
+
+Note 1: I did not know how to change font size using an arguement in pathway_errorbar_fixed function. So I changed it directly in the source r code.
+
+Note 2: The figure below is formatted to publication-ready standards based on png file via ggsave(). It is included in the zipped folder as a standalone png . HTML rendering does not fully show the adjustments.
+```{r}
+source('ggpicrust2_errorbar_function_fixed.R')
+
+peb = pathway_errorbar_fixed(abundance = path_abun_vitaminc, 
+                     daa_results_df = daa_annotated_filtered_df, 
+                     Group = meta_vitaminc$Vitamin_C, 
+                     wrap_label = T, wraplength=30,
+                     fc_cutoff = 1, order_by_log = T,
+                     p_values_threshold = 0.05, 
+                     order = "group", 
+                     ko_to_kegg = FALSE, 
+                     p_value_bar = TRUE, 
+                     x_lab = "description", 
+                     colors = c('#F5793A', '#005AB5'))
+ggsave("project_data/vitaminc_daa_error_bar.png",
+       plot = peb, width = 18, height = 10)
+```
+
+```{r}
+pca_vc = pathway_pca(abundance = path_abun_vitaminc,
+            metadata = meta_vitaminc,
+            group = 'Vitamin_C', 
+            colors = c('#F5793A', '#005AB5'))
+volcano = pathway_volcano(daa_annotated_l2fc_df,
+                       fc_col = "log2_fold_change",
+                       p_col = "p_adjust",
+                       label_col = ",description",
+                       label_top_n = 0,
+                       point_alpha = 0.4,
+                       colors = c('#F5793A', '#005AB5', '#E03C8A'))
+ggsave("project_data/pathway_pca_vc.png",
+       plot = pca_vc, width = 8, height = 6)
+ggsave("project_data/pathway_volcano.png",
+       plot = volcano, width = 9, height = 5)
+```
+
+```{r}
+dist_matrix <- vegdist(t(path_abun_vitaminc), method = "bray")
+
+permanova_result <- adonis2(dist_matrix ~ Vitamin_C, 
+                            data = meta_vitaminc, 
+                            permutations = 9999)
+
+print(permanova_result)
+```

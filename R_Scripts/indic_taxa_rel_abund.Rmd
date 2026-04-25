@@ -1,0 +1,96 @@
+---
+title: "differential_abundance_v2"
+output: html_document
+date: "2026-03-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Loading Library
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+library(writexl)
+library(ANCOMBC)
+library(ggpubr)
+library(patchwork)
+library(ggsignif)
+```
+
+```{r}
+ps_vc = readRDS('phyloseq.rds')
+set.seed(421)
+
+sig_taxa_asv = c("4c8288bfbd76958c0c094d87b97650f8", "9f79ff73dcbc3e304545d60cdbbca33b",
+                 "84311c29ab5cf09c0720c450dc7c1a43")
+
+tax_df = as.data.frame(tax_table(ps_vc)) %>% 
+  rownames_to_column(var = 'taxon') %>% 
+  filter(taxon %in% sig_taxa_asv) 
+
+vc_daa_sig = as.data.frame(otu_table(ps_vc)) %>% 
+  rownames_to_column(var = 'taxon') %>% 
+  filter(taxon %in% sig_taxa_asv) %>% 
+  full_join(tax_df, by = 'taxon')
+
+```
+
+
+```{r}
+ps_vc_rel = transform_sample_counts(ps_vc, function(x) x/ sum(x))
+ps_vc_sig = prune_taxa(sig_taxa_asv, ps_vc_rel)
+daa_data = psmelt(ps_vc_sig) %>% 
+  filter(Vitamin_C == 'Low'| Vitamin_C == 'typical' | Vitamin_C == "High")
+
+daa_data <- daa_data %>%
+  mutate(Vitamin_C = fct_recode(Vitamin_C, "Typical" = "typical"))
+daa_data$Vitamin_C = factor(daa_data$Vitamin_C, levels = c('Low', 'Typical', 'High'))
+
+
+daa_facet = ggplot(daa_data,
+                   aes(x = Vitamin_C,
+                       y = Abundance*100,
+                       fill = Vitamin_C))+
+  geom_boxplot(outlier.shape = NA)+
+  geom_jitter(alpha = 0.4)+
+  scale_fill_manual(values = c('High' = '#F5793A', 'Low' = '#E03C8A', 'Typical' = '#005AB5'))+
+  facet_wrap(~Genus, scales = 'free', ncol = 3)+
+  labs(x = 'Vitamin C Intake', y = 'Relative Abundance (%)')+
+  theme_minimal()+
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = 'black'),
+    axis.text.x = element_text(size = 28, angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 28),
+    axis.title = element_text(size = 32),
+    legend.position = 'none',
+    strip.text = element_text(size = 32, face = 'italic'))
+
+ggsave("indic_abun.png",
+       plot = daa_facet, width = 18, height = 10)
+
+daa_facet
+```
+
+```{r}
+mean_abundance_table <- daa_data %>%
+  mutate(Abundance = Abundance*100) %>% 
+  group_by(Genus, Vitamin_C) %>%
+  summarise(
+    mean_rel_abun = mean(Abundance, na.rm = TRUE),
+    med_rel_abun = median(Abundance, na.rm = TRUE),
+    sd_rel_abun = sd(Abundance, na.rm = TRUE),
+    n = n(),
+    sem_rel_abun = sd_rel_abun / sqrt(n)
+  ) %>% 
+  ungroup()
+
+```
+  

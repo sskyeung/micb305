@@ -41,9 +41,8 @@ micb305
 |   |
 |   |-- Table -- contains all tables used in the manuscript
 |
-```
 |-- Meeting_notes -- meeting notes and agenda with MICB_305 teaching team
-
+```
 
 A special thanks to Avrial Metcalfe-Roach and Claire Sie for their guidance. 
 

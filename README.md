@@ -17,30 +17,55 @@ https://ubcca-my.sharepoint.com/:w:/g/personal/rmurata_student_ubc_ca/IQDo9oW-kJ
 The following gives an overall structure of the repository. 
 
 micb305
+
 |
+
 |-- R_Scripts -- contains all R code used in the manuscript
+
 |   |
+
 |   |-- alpha_diversity -- contains all R code used for running alpha shannon diversity
+
 |   |
+
 |   |-- correlation_matrix -- contains all R code used for running Spearman correlation matrix
+
 |   |
+
 |   |-- data_wrangling -- contains all R code used for wrangling data from QIIME2 output
+
 |   |
+
 |   |-- differential_abundance -- contains all R code used for running LinDa differential abundance 
+
 |   |
+
 |   |-- functional_analysis -- contains all R code used for functional analysis based on PICRSt2 output
+
 |   |
+
 |   |-- indicator_taxa_abundance -- contains all R code used for calculating relative abundance of indicator taxa 
+
 |   |
+
 |   |-- indicator_taxa_analysis -- contains all R code used for running Multipatt indicator taxa anlaysis
+
 |
+
 |-- Results -- contains all outputs, figures and tables used in the manuscript
+
 |   |
+
 |   |-- Figures -- contains all figures used in the manuscript
+
 |   |
+
 |   |-- Table -- contains all tables used in the manuscript
+
 |
+
 |-- Meeting_notes -- meeting notes and agenda with MICB_305 teaching team
+
 
 A special thanks to Avrial Metcalfe-Roach and Claire Sie for their guidance. 
 

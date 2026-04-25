@@ -44,7 +44,9 @@ micb305
 |-- Meeting_notes -- meeting notes and agenda with MICB_305 teaching team
 ```
 
-A special thanks to Avrial Metcalfe-Roach and Claire Sie for their guidance. 
+
+## Acknowledgement
+A special thanks to Avrial Metcalfe-Roach and Claire Sie for their guidance throughout the project. 
 
 
 

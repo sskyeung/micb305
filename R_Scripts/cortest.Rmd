@@ -1,0 +1,156 @@
+---
+title: "Cortest"
+output: html_document
+date: "2026-03-31"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(pheatmap)
+library(igraph)
+```
+
+# Full Version
+```{r}
+ps_vc = readRDS('phyloseq_taxonomy.rds') %>% 
+  subset_samples(Disease == 'PD') %>% 
+  subset_samples(!is.na(Vitamin_C))
+ps_genus_vc = tax_glom(ps_vc, 'Genus')
+metacyc = read_tsv('path_abun_unstrat.tsv') 
+
+ps_genus_vc_rel = ps_genus_vc %>% 
+  microbiome::transform('compositional')
+
+taxa = as.data.frame(tax_table(ps_genus_vc_rel)) %>% 
+  filter(Genus == " g__Catenibacterium"|
+           Genus == " g__UCG-005"|
+           Genus == " g__Fournierella"|
+           Genus == " g__Escherichia-Shigella"|
+           Genus == " g__Victivallis"|
+           Genus == " g__Muribaculaceae"|
+           Family == " f__Puniceicoccaceae" & Genus == " g__uncultured") %>% 
+  rownames()
+         
+
+ps_genus_vc_rel_taxa = prune_taxa(taxa,ps_genus_vc_rel)
+otu = data.frame(ps_genus_vc_rel_taxa@otu_table)
+
+meta = data.frame(sample_data(ps_genus_vc_rel_taxa)) |>
+  select(Vitamin_C, Age_onset) |>
+  t() 
+metacyc_select = metacyc |>
+  filter(pathway == 'AST-PWY' |
+           pathway == 'DHGLUCONATE-PYR-CAT-PWY' |
+           pathway == 'ECASYN-PWY' |
+           pathway == 'KETOGLUCONMET-PWY'|
+           pathway == 'METHGLYUT-PWY' |
+           pathway == 'NAD-BIOSYNTHESIS-II' |
+           pathway == 'ORNDEG-PWY' |
+           pathway == 'PWY-5138' |
+           pathway == 'PWY-6961' |
+           pathway == 'PWY-7446' |
+           pathway == 'PWY-7873' |
+           pathway == 'PWY-7874' |
+           pathway == 'PWY0-1338' |
+           pathway == 'PWY0-862' |
+           pathway == 'PWY66-373' ) |>
+  column_to_rownames('pathway') |>
+  select(all_of(colnames(meta)))
+
+pathway_description <- c(
+  "AST-PWY" = "L-arginine degradation II (AST pathway)",
+  "DHGLUCONATE-PYR-CAT-PWY" = "glucose degradation (oxidative)",
+  "ECASYN-PWY" = "enterobacterial common antigen biosynthesis",
+  "KETOGLUCONMET-PWY" = "ketogluconate metabolism",
+  "METHGLYUT-PWY" = "superpathway of methylglyoxal degradation",
+  "NAD-BIOSYNTHESIS-II" = "NAD salvage pathway II",
+  "ORNDEG-PWY" = "superpathway of ornithine degradation",
+  "PWY-5138" = "fatty acid beta-oxidation",
+  "PWY-6961" = "L-ascorbate degradation II",
+  "PWY-7446" = "sulfoglycolysis",
+  "PWY-7873" = "D-erythronate degradation II",
+  "PWY-7874" = "L-threonate degradation",
+  "PWY0-1338" = "polymyxin resistance",
+  "PWY0-862" = "(5Z)-dodec-5-enoate biosynthesis",
+  "PWY66-373" = "sucrose degradation V"
+)
+
+taxa = c(
+  "9f79ff73dcbc3e304545d60cdbbca33b" = "Victivallis",
+  "cbd66fa79a3e7fa1c33d29ed908de048" = "Catenibacterium",
+  "6ca83bb8d84d22ff21607c96e42f4295" = "Uncultured Puniceicoccaceae genus",
+  "4c8288bfbd76958c0c094d87b97650f8" = "Escherichia-Shigella",
+  "d4dcc0bc5f5a6e517ddf472187dbc2e7" = "UCG-005 (Oscillospiraceae)",
+  "5b73138c8555560a7cd45cb7bd7ca6da" = "Fournierella",
+  "84311c29ab5cf09c0720c450dc7c1a43" = "Muribaculaceae"
+)
+
+rownames(metacyc_select) <- pathway_description[rownames(metacyc_select)]
+rownames(otu) <- ifelse(rownames(otu) %in% names(taxa), 
+                        taxa[rownames(otu)], 
+                        rownames(otu))
+
+
+summary = rbind(otu, 
+                meta, 
+              metacyc_select)
+
+rownames(summary) <- gsub("_", " ", rownames(summary))
+otu_cor = cor(t(summary), method = 'spearman')
+cor_cutoff = 0.3
+wmat = abs(otu_cor)
+diag(wmat) = 0
+wmat[wmat < cor_cutoff] = 0
+g_w = graph_from_adjacency_matrix(wmat, mode = "undirected", weighted = TRUE, diag = FALSE)
+E(g_w)$weight = 1 / pmax(E(g_w)$weight, .Machine$double.eps)
+btw_w = betweenness(g_w, weights = E(g_w)$weight, normalized = TRUE)
+btw_w %>% sort
+
+corr_mat = pheatmap(otu_cor,
+         clustering_method = "complete",
+         color = colorRampPalette(c("#F5793A","white","#005AB5"))(50),
+         breaks = seq(-1, 1, length.out = 51),
+         main = "",
+         display_numbers = T,
+         font_face = 'bold')
+ggsave('full_matrix.png', plot = corr_mat, bg = "white",
+       width = 12, 
+       height = 10, 
+       units = "in", 
+       dpi = 300)
+```
+# Partial Version
+```{r}
+summary = summary %>% 
+  slice(-c(1, 2, 3, 5, 6, 7))
+rownames(summary) <- gsub("_", " ", rownames(summary))
+rownames(summary) <- gsub("_", " ", rownames(summary))
+otu_cor = cor(t(summary), method = 'spearman')
+cor_cutoff = 0.3
+wmat = abs(otu_cor)
+diag(wmat) = 0
+wmat[wmat < cor_cutoff] = 0
+g_w = graph_from_adjacency_matrix(wmat, mode = "undirected", weighted = TRUE, diag = FALSE)
+E(g_w)$weight = 1 / pmax(E(g_w)$weight, .Machine$double.eps)
+btw_w = betweenness(g_w, weights = E(g_w)$weight, normalized = TRUE)
+btw_w %>% sort
+
+corr_mat = pheatmap(otu_cor,
+         clustering_method = "complete",
+         color = colorRampPalette(c("#F5793A","white","#005AB5"))(50),
+         breaks = seq(-1, 1, length.out = 51),
+         main = "",
+         display_numbers = T,
+         font_face = 'bold')
+ggsave('partial_matrix.png', plot = corr_mat, bg = "white",
+       width = 12, 
+       height = 10, 
+       units = "in", 
+       dpi = 300)
+
+```

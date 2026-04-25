@@ -146,7 +146,7 @@ sample_data(ps_jeremy_data) = sample_data(PD_binned)
 ```
 
 
-#Vitamin C for manuscript: (With jitter)
+#ALPHA Diversity: Vitamin C for manuscript: (With jitter)
 ```{r}
 psrare = ps_jeremy_data %>% rarefy_even_depth(sample.size = 9555, rngseed = 421)
 
@@ -201,7 +201,7 @@ ggsave('Alpha Diversity Vitamin C_manuscript.jpeg',
 
 ```
 
-# All nutrients except vitC for manuscript supplemental:
+# ALPHA Diversity: All nutrients except vitC for manuscript supplemental:
 ```{r}
 library(stringr)
 library(ggplot2)

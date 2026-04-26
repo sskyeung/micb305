@@ -34,6 +34,8 @@ micb305
 |   |-- indicator_taxa_abundance -- contains all R code used for calculating relative abundance of indicator taxa 
 |   |
 |   |-- indicator_taxa_analysis -- contains all R code used for running Multipatt indicator taxa anlaysis
+|   |
+|   |-- random_forest -- contains all R code used for running Random Forest analysis 
 |
 |-- Results -- contains all outputs, figures and tables used in the manuscript
 |   |

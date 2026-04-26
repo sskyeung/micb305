@@ -1,0 +1,212 @@
+---
+title: "Current-Code"
+output: html_document
+date: "2026-02-25"
+---
+
+```{r Dataset}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+library(writexl)
+library(indicspecies)
+
+metadata = read.delim('parkinsons_metadata 2 2.txt', header = TRUE, row.names = 1)
+metadata_PD <- subset(metadata, Disease == "PD")
+
+##33rd and 67th percentile, sd values created too large sample pool of in between and too small of extreme ends
+PD_sum = metadata_PD |>
+  group_by(Sex) |>
+  summarise(
+    p33_alpha_carotene = quantile(Alpha_carotene, 0.33, na.rm = TRUE),
+    p33_beta_carotene = quantile(Beta_carotene, 0.33, na.rm = TRUE),
+    p33_Copper = quantile(Copper, 0.33, na.rm = TRUE),
+    p33_selenium = quantile(Selenium, 0.33, na.rm = TRUE),
+    p33_Vitamin_A = quantile(Vitamin_A, 0.33, na.rm = TRUE),
+    p33_Vitamin_C = quantile(Vitamin_C, 0.33, na.rm = TRUE),
+    p33_Vitamin_E = quantile(Vitamin_E, 0.33, na.rm = TRUE),
+    p33_Car_total = quantile(Carotene_total, 0.33, na.rm = TRUE),
+    p67_alpha_carotene = quantile(Alpha_carotene, 0.67, na.rm = TRUE),
+    p67_beta_carotene = quantile(Beta_carotene, 0.67, na.rm = TRUE),
+    p67_Copper = quantile(Copper, 0.67, na.rm = TRUE),
+    p67_selenium = quantile(Selenium, 0.67, na.rm = TRUE),
+    p67_Vitamin_A = quantile(Vitamin_A, 0.67, na.rm = TRUE),
+    p67_Vitamin_C = quantile(Vitamin_C, 0.67, na.rm = TRUE),
+    p67_Vitamin_E = quantile(Vitamin_E, 0.67, na.rm = TRUE),
+    p67_Car_total = quantile(Carotene_total, 0.67, na.rm = TRUE))
+
+PD_male <- metadata_PD |>
+  filter(Sex == "Male") |>
+  select(
+    Alpha_carotene, Beta_carotene, Copper, Manganese,
+    Selenium, Vitamin_A, Vitamin_C, Vitamin_E, Carotene_total) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "Antioxidant",
+    values_to = "value") |>
+  group_by(Antioxidant) |>
+  summarise(
+    '33rd percentile (pg/mL)' = quantile(value, 0.33, na.rm = TRUE),
+    '67th percentile' = quantile(value, 0.67, na.rm = TRUE))
+
+#identifying tertile ranges of antioxidants)
+PD_male  
+PD_female <- metadata_PD |>
+  filter(Sex == "Female") |>
+  select(
+    Alpha_carotene, Beta_carotene, Copper, Manganese,
+    Selenium, Vitamin_A, Vitamin_C, Vitamin_E, Carotene_total) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "Antioxidant",
+    values_to = "value") |>
+  group_by(Antioxidant) |>
+  summarise(
+    '33rd percentile' = quantile(value, 0.33, na.rm = TRUE),
+    '67th percentile' = quantile(value, 0.67, na.rm = TRUE))
+
+PD_female  
+
+tab_male <- ggtexttable(PD_male, rows = NULL, theme = ttheme("blank")) %>%
+ tab_add_hline(at.row = 1:2, row.side = "top", linewidth = 3.5) %>%
+  tab_add_hline(at.row = 10, row.side = "bottom", linewidth = 3.5) %>%
+  tab_add_title(text = "Male",
+                face = "bold")
+tab_male
+
+tab_female <- ggtexttable(PD_female, rows = NULL, theme = ttheme("blank")) %>%
+ tab_add_hline(at.row = 1:2, row.side = "top", linewidth = 3.5) %>%
+  tab_add_hline(at.row = 10, row.side = "bottom", linewidth = 3.5) %>%
+  tab_add_title(text = "Female",
+                face = "bold")
+tab_female
+
+
+#PD_male_grouped <- subset(metadata_PD, Sex == "Male")  == 122 patients
+#PD_female_grouped <- subset(metadata_PD, Sex == "Female") == 75 patients
+
+#Categorizing High, Typical and Low
+PD_binned = metadata_PD |>
+  drop_na(Alpha_carotene, Beta_carotene, Copper, Manganese, Selenium, Vitamin_A, Vitamin_C, Vitamin_E, Carotene_total) |>
+  mutate(Alpha_carotene =
+           case_when(Sex == "Male" & Alpha_carotene > 548.2559 ~ "High",
+                     Sex == "Male" & Alpha_carotene < 189.350 ~ "Low",
+                     Sex == "Male" & Alpha_carotene ~ "Typical",
+                     Sex == "Female" & Alpha_carotene > 575.7513 ~ "High",
+                     Sex == "Female" & Alpha_carotene < 541.904 ~ "Low",
+                     Sex == "Female" & Alpha_carotene ~ "Typical"),
+         Beta_carotene = 
+           case_when(Sex == "Male" & Beta_carotene > 3542.550 ~ "High",
+                     Sex == "Male" & Beta_carotene < 2229.975 ~ "Low",
+                     Sex == "Male" & Beta_carotene ~ "Typical",
+                     Sex == "Female" & Beta_carotene > 5100.328 ~ "High",
+                     Sex == "Female" & Beta_carotene < 3178.988 ~ "Low",
+                     Sex == "Female" & Beta_carotene ~ "Typical"),
+         Copper = 
+           case_when(Sex == "Male" & Copper > 1.200000 ~ "High",
+                     Sex == "Male" & Copper < 0.8431575 ~ "Low",
+                     Sex == "Male" & Copper ~ "Typical",
+                     Sex == "Female" & Copper > 1.285575 ~ "High",
+                     Sex == "Female" & Copper < 1.0000000 ~ "Low",
+                     Sex == "Female" & Copper ~ "Typical"),
+         Selenium = 
+           case_when(Sex == "Male" & Selenium > 58.39314 ~ "High",
+                     Sex == "Male" & Selenium < 42.72238 ~ "Low",
+                     Sex == "Male" & Selenium ~ "Typical",
+                     Sex == "Female" & Selenium > 65.45464 ~ "High",
+                     Sex == "Female" & Selenium < 44.83593 ~ "Low",
+                     Sex == "Female" & Selenium ~ "Typical"),
+         Vitamin_A =
+           case_when(Sex == "Male" & Vitamin_A > 328.4200 ~ "High",
+                     Sex == "Male" & Vitamin_A < 191.623 ~ "Low",
+                     Sex == "Male" & Vitamin_A ~ "Typical",
+                     Sex == "Female" & Vitamin_A > 419.0756 ~ "High",
+                     Sex == "Female" & Vitamin_A < 223.012 ~ "Low",
+                     Sex == "Female" & Vitamin_A ~ "Typical"),
+         Vitamin_C =
+           case_when(Sex == "Male" & Vitamin_C > 119.2655 ~ "High",
+                     Sex == "Male" & Vitamin_C < 82.31294 ~ "Low",
+                     Sex == "Male" & Vitamin_C ~ "Typical",
+                     Sex == "Female" & Vitamin_C > 165.2305 ~ "High",
+                     Sex == "Female" & Vitamin_C < 108.04810 ~ "Low",
+                     Sex == "Female" & Vitamin_C ~ "Typical"),
+         Vitamin_E =
+           case_when(Sex == "Male" & Vitamin_E > 12.09911 ~ "High",
+                     Sex == "Male" & Vitamin_E < 8.652149 ~ "Low",
+                     Sex == "Male" & Vitamin_E ~ "Typical",
+                     Sex == "Female" & Vitamin_E > 14.34675 ~ "High",
+                     Sex == "Female" & Vitamin_E < 10.580000 ~ "Low",
+                     Sex == "Female" & Vitamin_E ~ "Typical"),
+         Carotene_total =
+           case_when(Sex == "Male" & Carotene_total > 4064.849 ~ "High",
+                     Sex == "Male" & Carotene_total < 2495.81 ~ "Low",
+                     Sex == "Male" & Carotene_total ~ "Typical",
+                     Sex == "Female" & Carotene_total > 5691.588 ~ "High",
+                     Sex == "Female" & Carotene_total < 3636.83 ~ "Low",
+                     Sex == "Female" & Carotene_total ~ "Typical"))
+
+
+## starting from below is just viewing count
+
+Alpha_count_high = sum(PD_binned$Alpha_carotene == "High")
+Alpha_count_low = sum(PD_binned$Alpha_carotene == "Low")
+Alpha_count_Typical = sum(PD_binned$Alpha_carotene == "Typical")
+
+Beta_count_high = sum(PD_binned$Beta_carotene == "High")
+Beta_count_low = sum(PD_binned$Beta_carotene == "Low")
+Beta_count_Typical = sum(PD_binned$Beta_carotene == "Typical")
+
+Selenium_high = sum(PD_binned$Selenium == "High")
+Selenium_low = sum(PD_binned$Selenium == "Low")
+Selenium_Typical = sum(PD_binned$Selenium == "Typical")
+
+Vitamin_A_high = sum(PD_binned$Vitamin_A == "High")
+Vitamin_A_low = sum(PD_binned$Vitamin_A == "Low")
+Vitamin_A_Typical = sum(PD_binned$Vitamin_A == "Typical")
+
+Vitamin_C_high = sum(PD_binned$Vitamin_C == "High")
+Vitamin_C_low = sum(PD_binned$Vitamin_C == "Low")
+Vitamin_C_Typical = sum(PD_binned$Vitamin_C == "Typical")
+
+Vitamin_E_high = sum(PD_binned$Vitamin_E == "High")
+Vitamin_E_low = sum(PD_binned$Vitamin_E == "Low")
+Vitamin_E_Typical = sum(PD_binned$Vitamin_E == "Typical")
+
+Carotene_Total_high = sum(PD_binned$Carotene_total == "High")
+Carotene_Total_low = sum(PD_binned$Carotene_total == "Low")
+Carotene_Total_Typical = sum(PD_binned$Carotene_total == "Typical")
+
+Copper_high = sum(PD_binned$Copper == "High")
+Copper_low = sum(PD_binned$Copper == "Low")
+Copper_Typical = sum(PD_binned$Copper == "Typical")
+```
+
+```{r Phyloseq}
+set.seed(421)
+taxonomy = read.delim('taxonomy.tsv', header = TRUE, row.names = "Feature.ID" ) # from qiime2
+counts = read.delim('table.txt', skip=1, row.names=1)  # from qiime2
+tree = read_tree('tree.nwk')
+
+taxonomy_formatted = taxonomy %>%
+  separate(col= Taxon,
+           into = c('Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'),
+           sep = '; ', fill = 'right') %>%
+  select(-Confidence) %>%
+  as.matrix()
+
+counts_formatted = as.matrix(counts)
+
+ps <- phyloseq(sample_data(PD_binned),
+               otu_table(counts_formatted, taxa_are_rows = T),
+               tax_table(taxonomy_formatted),
+               tree)
+
+ps_genus = tax_glom(ps,'Genus')
+ps_relab = transform(ps_genus, 'compositional')
+ps_filt = filter_taxa(ps_relab, function(x) mean(x) > 0.0001, TRUE)
+otu_table = data.frame(otu_table(ps_filt))
+saveRDS(ps, file = "phyloseq.rds")
+```

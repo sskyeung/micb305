@@ -4,6 +4,9 @@ This repository is created a microbiome research project for MICB 305: Data Scie
 
 **Authors/Contributors:** Denali Gordon, Riko Murata, James Nam, Jeremy Siu, Kyle Yeung
 
+## Project Overview
+Parkinson’s Disease (PD) is a progressive neurodegenerative disorder characterized by the loss of dopaminergic neurons and the accumulation of misfolded α-synuclein proteins. While dietary antioxidants like vitamin C can neutralize reactive oxygen species, clinical evidence of their neuroprotective efficacy remains inconsistent. This study explores the gut-brain axis as a potential mediator of these effects. PD is characterized by specific gut dysbiosis, and since vitamin C is known to modulate similar taxa, investigating the interaction between antioxidant intake and the PD microbiome may clarify how diet influence disease pathology and timing of age of onset. 
+We aim to explore how dietary vitamin C influences the gut microbiome composition in patients with PD and whether these microbial shifts correlate with the age of disease onset. Using 16s rRNA sequencing data from a cohort of 197 PD patients, the study identifies specific bacterial taxa and functional metabolic pathways associated with antioxidant intake. 
 
 ## Relevant Documents
 Proposal:

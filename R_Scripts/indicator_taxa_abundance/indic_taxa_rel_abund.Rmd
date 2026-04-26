@@ -46,10 +46,9 @@ vc_daa_sig = as.data.frame(otu_table(ps_vc)) %>%
 ps_vc_rel = transform_sample_counts(ps_vc, function(x) x/ sum(x))
 ps_vc_sig = prune_taxa(sig_taxa_asv, ps_vc_rel)
 daa_data = psmelt(ps_vc_sig) %>% 
-  filter(Vitamin_C == 'Low'| Vitamin_C == 'typical' | Vitamin_C == "High")
+  filter(Vitamin_C == 'Low'| Vitamin_C == 'Typical' | Vitamin_C == "High")
 
-daa_data <- daa_data %>%
-  mutate(Vitamin_C = fct_recode(Vitamin_C, "Typical" = "typical"))
+
 daa_data$Vitamin_C = factor(daa_data$Vitamin_C, levels = c('Low', 'Typical', 'High'))
 
 

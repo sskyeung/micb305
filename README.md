@@ -1,7 +1,9 @@
 # micb305 Team 8
-This repository is created for MICB 305 25WT2 (Department of Microbiology and Immunology, University of British Columbia, Vanoucver BC), and contains all code ncessary to reproduce "Low dietary vitamin C intake is associated with the presence of pro-inflammatory taxa and the enrichment of oxidative stress related functional pathways in Parkinson’s disease with no correlation to age of onset". 
+## Low dietary vitamin C intake is associated with the presence of pro-inflammatory taxa and the enrichment of oxidative stress related functional pathways in Parkinson’s disease with no correlation to age of onset
+This repository is created a microbiome research project for MICB 305: Data Science in Microbiology and Immunology Research 25WT2 (Department of Microbiology and Immunology, University of British Columbia, Vanoucver BC). It contains all codes, analyses and outputs ncessary to reproduce our research. 
 
-Authors/Contributors: Denali Gordon, Riko Murata, James Nam, Jeremy Siu, Kyle Yeung
+**Authors/Contributors:** Denali Gordon, Riko Murata, James Nam, Jeremy Siu, Kyle Yeung
+
 
 ## Relevant Documents
 Proposal:

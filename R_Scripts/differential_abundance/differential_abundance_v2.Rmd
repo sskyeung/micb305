@@ -71,18 +71,17 @@ vc_daa_sig = output_genus_vc$res %>%
 ps_vc_rel = transform_sample_counts(ps_vc, function(x) x/ sum(x))
 ps_vc_sig = prune_taxa(sig_taxa_asv, ps_vc_rel)
 daa_data = psmelt(ps_vc_sig) %>% 
-  filter(Vitamin_C == 'Low'| Vitamin_C == 'typical' | Vitamin_C == "High")
+  filter(Vitamin_C == 'Low'| Vitamin_C == 'Typical' | Vitamin_C == "High")
 
 daa_data$Genus = factor(daa_data$Genus, levels = vc_daa_sig$Genus)
 vc_daa_sig$Genus = factor(vc_daa_sig$Genus, levels = vc_daa_sig$Genus)
-daa_data$Vitamin_C = factor(daa_data$Vitamin_C, levels = c('High', 'typical', 'Low'))
+daa_data$Vitamin_C = factor(daa_data$Vitamin_C, levels = c('High', 'Typical', 'Low'))
 
 daa_boxplot = ggplot(daa_data, aes(y = Genus, x = Abundance*100, fill = Vitamin_C)) +
   geom_boxplot(outlier.shape = NA)+
   geom_jitter(alpha = 0.4)+
   coord_cartesian(xlim = c(0, 4))+
-  scale_fill_manual(values = c('High' = '#F5793A', 'Low' = '#E03C8A', 'typical' = '#005AB5'),
-                    labels = c('High' = 'High', 'Low' = 'Low', 'typical' = 'Typical'))+
+  scale_fill_manual(values = c('High' = '#F5793A', 'Low' = '#E03C8A', 'Typical' = '#005AB5'))+
   labs(x = 'Relative Abundance (%)', y = 'Genus')+
   theme_minimal()+
   theme(panel.grid.major = element_blank(),
@@ -125,14 +124,13 @@ daa_combined = (daa_boxplot | daa_lfc | daa_qval) +
   plot_layout (widths = c(3, 1, 0.7), guides = 'collect') & theme(legend.position = 'right')
 ggsave("daa_low_high.png",
        plot = daa_combined, width = 18, height = 10)
-
 ```
 
 # Low vs Typical
 ```{r}
 
 sig_taxa_asv_t = output_genus_vc$res %>% 
-  filter(q_Vitamin_Ctypical < 0.05) %>% 
+  filter(q_Vitamin_CTypical < 0.05) %>% 
   filter(taxon != "dd228d51656bfa4af8a21464f726fbfc") %>% 
   select(taxon) %>% 
   pull()
@@ -142,28 +140,27 @@ tax_df_t = as.data.frame(tax_table(ps_vc)) %>%
   filter(taxon %in% sig_taxa_asv_t) 
 
 vc_daa_sig_t = output_genus_vc$res %>% 
-  filter(q_Vitamin_Ctypical < 0.05) %>% 
+  filter(q_Vitamin_CTypical < 0.05) %>% 
   full_join(tax_df_t, by = 'taxon') %>% 
-  select(taxon, lfc_Vitamin_Ctypical, q_Vitamin_Ctypical, Genus) %>% 
-  arrange(lfc_Vitamin_Ctypical)%>% 
-  mutate(q_label = sprintf('%.3f', q_Vitamin_Ctypical))  %>% 
+  select(taxon, lfc_Vitamin_CTypical, q_Vitamin_CTypical, Genus) %>% 
+  arrange(lfc_Vitamin_CTypical)%>% 
+  mutate(q_label = sprintf('%.3f', q_Vitamin_CTypical))  %>% 
   filter(Genus != "g__Chloroplast")
 
 
 ps_vc_sig_t = prune_taxa(sig_taxa_asv_t, ps_vc_rel)
 daa_data_t = psmelt(ps_vc_sig_t) %>% 
-  filter(Vitamin_C == 'Low'| Vitamin_C == 'typical' | Vitamin_C == "High")
+  filter(Vitamin_C == 'Low'| Vitamin_C == 'Typical' | Vitamin_C == "High")
 
 daa_data_t$Genus = factor(daa_data_t$Genus, levels = vc_daa_sig_t$Genus)
 vc_daa_sig_t$Genus = factor(vc_daa_sig_t$Genus, levels = vc_daa_sig_t$Genus)
-daa_data_t$Vitamin_C = factor(daa_data_t$Vitamin_C, levels = c('High', 'typical', 'Low'))
+daa_data_t$Vitamin_C = factor(daa_data_t$Vitamin_C, levels = c('High', 'Typical', 'Low'))
 
 daa_boxplot_t = ggplot(daa_data_t, aes(y = Genus, x = Abundance*100, fill = Vitamin_C)) +
   geom_boxplot(outlier.shape = NA)+
   geom_jitter(alpha = 0.4)+
   coord_cartesian(xlim = c(0, 4))+
-  scale_fill_manual(values = c('High' = '#F5793A', 'Low' = '#E03C8A', 'typical' = '#005AB5'),
-                    labels = c('High' = 'High', 'Low' = 'Low', 'typical' = 'Typical'))+
+  scale_fill_manual(values = c('High' = '#F5793A', 'Low' = '#E03C8A', 'Typical' = '#005AB5'))+
   labs(x = 'Relative Abundance (%)', y = 'Genus')+
   theme_minimal()+
   theme(panel.grid.major = element_blank(),
@@ -173,7 +170,7 @@ daa_boxplot_t = ggplot(daa_data_t, aes(y = Genus, x = Abundance*100, fill = Vita
         axis.text = element_text(size = 18),
         axis.title = element_text(size = 24, face = 'bold'))
 
-daa_lfc_t = ggplot(vc_daa_sig_t, aes(y = Genus, x = lfc_Vitamin_Ctypical)) +
+daa_lfc_t = ggplot(vc_daa_sig_t, aes(y = Genus, x = lfc_Vitamin_CTypical)) +
   geom_bar(stat = 'identity') +
   geom_vline(xintercept = 0, linetype = 'dashed', color = 'black')+
   labs(x = 'Log Fold change', y = NULL)+
@@ -207,7 +204,6 @@ daa_combined_t = (daa_boxplot_t | daa_lfc_t | daa_qval_t) +
 ggsave("daa_lowtyp.png",
        plot = daa_combined_t, width = 18, height = 10)
 
-daa_combined_t
 
 ```
 

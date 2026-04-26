@@ -1,0 +1,48 @@
+---
+title: "Indicator-taxa"
+output: html_document
+date: "2026-02-25"
+---
+
+```{r Vitamin C}
+library(tidyverse)
+library(phyloseq)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+
+set.seed(421)
+ps = readRDS('phyloseq.rds')
+
+ps_genus = tax_glom(ps, taxrank = "Genus")
+
+indval_vit_C = multipatt( t(ps_genus@otu_table), 
+                    cluster = ps_filt@sam_data$Vitamin_C,
+                    control = how(nperm = 999) )
+
+summary(indval_vit_C, indvalcomp = TRUE)
+
+# Extract into table
+indval_vit_C_table = as.data.frame(indval_vit_C$sign) %>%
+  filter(stat >=0.5, p.value <= 0.05)
+
+indval_vit_C_table 
+
+df <- data.frame(Genus = c("Escherichia-Shigella", "Victivallis", "Muribaculaceae"),
+                 Specificity = c(0.9229, 0.8818, 0.9181),
+                 Fidelity = c(0.5528, 0.3659, 0.3577),
+                 'Stat' = c(0.714, 0.568, 0.573),
+                 'P-value' = c(0.048, 0.008, 0.005),
+                 "Associated Intake Level(s)" = c("Low & Typical", "High & Typical","High & Typical"),
+                 check.names = FALSE)
+
+# Table with blank theme
+tab <- ggtexttable(df, rows = NULL, theme = ttheme("blank")) %>%
+ tab_add_hline(at.row = 1:2, row.side = "top", linewidth = 3.5) %>%
+  tab_add_hline(at.row = 4, row.side = "bottom", linewidth = 3.5) %>%
+  tab_add_title(text = "Table 1. Indicator species analysis associated with vitamin C intake levels",
+                face = "bold")
+tab
+
+```

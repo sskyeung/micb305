@@ -52,7 +52,7 @@ micb305
 
 
 ## Acknowledgement
-A special thanks to Avrial Metcalfe-Roach and Claire Sie for their guidance throughout the project. Additionally, the R function used to generate error bars for the differential abundance analysis of predicted pathways was provided by Avril Metcalfe-Roach. This code was essential for visualizing the LinDa output within this repository. Source code for this function is stored under R_Scripts/functional_analysis
+A special thanks to Avril Metcalfe-Roach and Claire Sie for their guidance throughout the project. Additionally, the R function used to generate error bars for the differential abundance analysis of predicted pathways was provided by Avril Metcalfe-Roach. This code was essential for visualizing the LinDa output within this repository. Source code for this function is stored under R_Scripts/functional_analysis
 
 
 

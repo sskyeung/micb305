@@ -10,9 +10,8 @@ library(phyloseq)
 library(vegan)
 library(ggpubr)
 library(microbiome)
-library(indicspecies)
 library(writexl)
-library(indicspecies)
+
 
 metadata = read.delim('parkinsons_metadata 2 2.txt', header = TRUE, row.names = 1)
 metadata_PD <- subset(metadata, Disease == "PD")

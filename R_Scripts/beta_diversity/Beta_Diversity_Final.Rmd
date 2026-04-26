@@ -143,7 +143,7 @@ ps = phyloseq(sample_data(PD_binned),
               tax_table(taxonomy_formatted), tree)
 
 #save phyloseq object
-saveRDS(ps, "project_data/phyloseq_taxonomy_binned.rds")
+saveRDS(ps, "phyloseq_taxonomy_binned.rds")
 ```
 
 Bray curtis beta diversity for the dietary antioxidants

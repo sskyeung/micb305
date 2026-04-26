@@ -146,9 +146,21 @@ sample_data(ps_jeremy_data) = sample_data(PD_binned)
 ```
 
 
+
+
+##Loading Phyloseq Object
+```{r}
+ps = readRDS('phyloseq.rds')
+
+sample_data(ps) 
+```
+
+
+
+
 #ALPHA Diversity: Vitamin C for manuscript: (With jitter)
 ```{r}
-psrare = ps_jeremy_data %>% rarefy_even_depth(sample.size = 9555, rngseed = 421)
+psrare = ps %>% rarefy_even_depth(sample.size = 9555, rngseed = 421)
 
 table(sample_sums(psrare))
 
@@ -207,7 +219,7 @@ library(stringr)
 library(ggplot2)
 library(ggh4x)
 
-psrare <- ps_jeremy_data %>% 
+psrare <- ps %>% 
   rarefy_even_depth(sample.size = 9555, rngseed = 421)
 
 set.seed(421)

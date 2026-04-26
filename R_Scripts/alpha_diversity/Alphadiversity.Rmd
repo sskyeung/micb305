@@ -1,0 +1,170 @@
+---
+title: "AlphaDiversity"
+author: "Riko"
+date: "2026-04-25"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(phyloseq)
+library(readxl)
+library(vegan)
+library(ggpubr)
+library(microbiome)
+library(indicspecies)
+library(writexl)
+library(ANCOMBC)
+library(ggpubr)
+
+##Loading Phyloseq Object
+ps = readRDS('phyloseq_taxonomy_binned.rds')
+
+sample_data(ps) 
+
+
+
+```
+
+#Vitamin C for manuscript: (With jitter)
+
+```{r}
+psrare = ps %>% rarefy_even_depth(sample.size = 9555, rngseed = 421)
+table(sample_sums(psrare))
+
+set.seed(421)
+p1 = plot_richness(psrare, x = 'Vitamin_C', 
+                  measures = c('Shannon'),
+                  color = 'Vitamin_C',
+                  )
+p1
+
+p1data = p1$data
+p1data
+
+vars <- c("Alpha_carotene","Beta_carotene","Copper","Selenium",
+          "Vitamin_A","Vitamin_C","Vitamin_E","Carotene_total")
+p1data <- p1$data %>%
+  dplyr::filter(!is.na(value)) %>% 
+  tidyr::drop_na(dplyr::all_of(vars))
+
+p1data
+
+p1data$Vitamin_C <- recode(p1data$Vitamin_C,
+                           "typical" = "Typical",
+                           )
+
+p1data$Vitamin_C <- factor(p1data$Vitamin_C,
+                           levels = c("Low", "Typical", "High"))
+
+
+alpha_plot_manu <- ggplot(p1data, aes(x = Vitamin_C,
+                                        y = value)) +
+  stat_boxplot(geom = "errorbar", width = 0.2) +
+  geom_boxplot(aes(fill=Vitamin_C), outlier.shape = NA) +
+  geom_jitter(height = 0, width = 0.2, size = 0.8, alpha = 0.6)+
+  scale_fill_manual(values = c("High" = "#F5793A", "Low" = "#E03C8A", "Typical" = "#005AB5")) +
+  labs(x = "Vitamin C intake levels", y = "Shannon Diversity Measure") +
+  ylim(1, 7)  +
+  theme_classic(base_size = 22) +
+  theme(legend.position = "none")
+alpha_plot_manu
+
+comparison = list( c('Low', 'Typical'),
+                   c('Low', 'High'),
+                   c('Typical', 'High'))
+
+alpha_plot_final_manu = alpha_plot_manu + 
+  stat_compare_means(comparisons = comparison, method = 'wilcox.test', size = 7)+
+  scale_y_continuous(expand = expansion(mult = c(0.06, 0.09)))
+alpha_plot_final_manu
+
+ggsave('Alpha Diversity Vitamin C_manuscript.jpeg',
+       plot = alpha_plot_final_manu,
+       height= 5, width = 7)
+
+
+```
+
+# All nutrients except vitC for manuscript supplemental:
+
+```{r}
+library(stringr)
+library(ggplot2)
+library(ggh4x)
+
+psrare <- ps %>% 
+  rarefy_even_depth(sample.size = 9555, rngseed = 421)
+
+set.seed(421)
+p <- plot_richness(psrare,
+                   x = 'Alpha_carotene',  # just needed to generate the dataframe
+                   measures = c('Shannon'),
+                   color = 'Alpha_carotene')
+
+
+vars <- c("Alpha_carotene","Beta_carotene","Copper","Selenium",
+          "Vitamin_A","Vitamin_E","Carotene_total")
+
+
+
+
+
+pdata_long <- p$data %>%
+  dplyr::filter(!is.na(value)) %>% 
+  tidyr::pivot_longer(cols = dplyr::all_of(vars),
+                      names_to = "nutrient",
+                      values_to = "intake_level") %>%
+  dplyr::filter(!is.na(intake_level))
+
+pdata_long <- pdata_long %>%
+  mutate(nutrient = str_to_title(gsub("_", " ", nutrient)))
+
+pdata_long <- pdata_long %>%
+  mutate(intake_level = factor(intake_level, levels = c("Low", "Typical", "High")))
+
+
+
+
+panel_labels <- pdata_long %>%
+  dplyr::distinct(nutrient) %>%
+  dplyr::arrange(nutrient) %>%   # respects facet order
+  dplyr::mutate(label = LETTERS[seq_len(n())])
+
+
+comparisons = list(c('Low', 'Typical'),
+                  c('Low', 'High'),
+                  c('Typical', 'High'))
+
+
+p_formatted <- pdata_long %>%
+  ggplot(aes(x = intake_level, y = value, fill = intake_level)) +
+  stat_boxplot(geom = "errorbar", width = 0.2) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, height = 0, size = 0.8, alpha = 0.6) +
+  scale_fill_manual(values = c("High" = "#F5793A", "Low" = "#E03C8A", "Typical" = "#005AB5")) +
+  facet_wrap(~nutrient, scales = "free_x", ncol = 3) +
+   geom_text(
+    data = panel_labels,
+    aes(x = -Inf, y = Inf, label = label),
+    inherit.aes = FALSE,
+    hjust = -0.6,
+    vjust = 1.6,
+    size = 8,
+    fontface = "bold"
+  ) +
+theme_classic(base_size = 22) +
+  theme(strip.text = element_text(face = "bold", size = 15),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  labs(x = 'Antioxidant Intake Levels', y = 'Shannon Diversity', fill = 'Nutrient Intake \nLevel') +
+  stat_compare_means(comparisons = comparisons, method = 'wilcox.test', 
+                     label.y.npc = 0.95, step.increase = 0.1, size = 5) +
+  scale_y_continuous(expand = expansion(mult = c(0.02, 0.12)))
+
+p_formatted
+
+ggsave('Alpha_Diversity_supp.jpeg',
+       plot = p_formatted,
+       height = 13, width = 14,  dpi = 1500)
+```

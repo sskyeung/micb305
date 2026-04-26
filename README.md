@@ -23,6 +23,8 @@ micb305
 |   |
 |   |-- alpha_diversity -- contains all R code used for running alpha shannon diversity
 |   |
+|   |-- beta_diversity -- contains all R code used for running beta (bray-curtis) diversity
+|   |
 |   |-- correlation_matrix -- contains all R code used for running Spearman correlation matrix
 |   |
 |   |-- data_wrangling -- contains all R code used for wrangling data from QIIME2 output

@@ -1,20 +1,23 @@
+taxonomy = read.delim('taxonomy.tsv', header = TRUE, row.names = "Feature.ID" ) # from qiime2
+counts = read.delim('table.txt', skip=1, row.names=1)  # from qiime2
+tree = read_tree('tree.nwk')
+
+taxonomy_formatted = taxonomy %>%
+  separate(col= Taxon,
+           into = c('Domain', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species'),
+           sep = '; ', fill = 'right') %>%
+  select(-Confidence) %>%
+  as.matrix()
+
+counts_formatted = as.matrix(counts)
+
+ps <- phyloseq(sample_data(PD_binned),
+               otu_table(counts_formatted, taxa_are_rows = T),
+               tax_table(taxonomy_formatted),
+               tree)
+
+ps_genus = tax_glom(ps,'Genus')
 indval_vit_C_table = as.data.frame(indval_vit_C$sign) %>%
   filter(stat >=0.5, p.value <= 0.05)
 
 indval_vit_C_table 
-
-df <- data.frame(Genus = c("Escherichia-Shigella", "Victivallis", "Victivallis"),
-                 Specificity = c(0.9161, 0.8740, 0.8906),
-                 Fidelity = c(0.5528, 0.3659, 0.3577),
-                 'Stat' = c(0.712, 0.565, 0.564),
-                 'P-value' = c(0.037, 0.011, 0.018),
-                 "Associated Intake Level(s)" = c("Low & Typical", "High & Typical","High & Typical"),
-                 check.names = FALSE)
-
-# Table with blank theme
-tab <- ggtexttable(df, rows = NULL, theme = ttheme("blank")) %>%
- tab_add_hline(at.row = 1:2, row.side = "top", linewidth = 3.5) %>%
-  tab_add_hline(at.row = 4, row.side = "bottom", linewidth = 3.5) %>%
-  tab_add_title(text = "Table 1. Indicator species analysis associated with vitamin C intake levels",
-                face = "bold")
-tab

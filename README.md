@@ -15,6 +15,21 @@ Does dietary vitamin C modulate the gut microbiome in a way that significantly i
 ## Dataset
 Data was sourced from **Cristae et al. (2020)** study, comprising faecal 16s rRNA sequences and comprehensive dietary metadata from 197 PD patients. The metadata includes intake levels of eight primary antioxidants and cliical records of disease age of onset.
 
+## Objective
+We answered the research question through four primary objectives:
+
+### 1. Diversity Analysis
+Determine the impact of vitamin C intake levels on gut microbial alpha diversity (richness/evenness) and beta diversity (compositional/dissimilarity). 
+
+### 2. Taxonomic Profiling
+Identify specific bacterial taxa that are differentially abundant or serve as indicators for varying levels of vitamin C intake. 
+
+### 3. Functional Annotation
+Identify the predicted metabolic pathways to understand vitamin C related shifts in the gut microbiome
+
+### 4. Predictive Modeling
+Determine whether vitamin C associated mcirobial markers can serve as reliable predictors for PD age of onset. 
+
 ## Relevant Documents
 Proposal:
 https://ubcca-my.sharepoint.com/:w:/r/personal/dgordo05_student_ubc_ca/Documents/MICB_305_proposal.docx?d=w9e17d40f9a2545d48d65e9a237ae4ac4&csf=1&web=1&e=30xfP3

@@ -35,6 +35,7 @@ Determine whether vitamin C associated mcirobial markers can serve as reliable p
 **Vitamin C intake levels was not significantly associated with differences in gut microbiome.** 
 
 [Figure 1A](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_1A_Alpha%20Diversity%20Vitamin%20C_manuscript.jpeg) [Figure 1A](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_1B_beta_diversity_vitC.png) 
+
 **3 statistically significant genera were associated with vitamin C intake levels.**
 
 [Table 1](https://github.com/sskyeung/micb305/blob/main/Results/Table/Table_1_indicator_taxa_table.png)

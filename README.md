@@ -76,7 +76,7 @@ micb305
 |   
 |-- Meeting_notes -- meeting notes and agenda with MICB_305 teaching team
 ```
-
+**Note:** For ease of access, the QIIME2 processing code are located in the root directory of this repository.
 
 ## Acknowledgement
 A special thanks to Avril Metcalfe-Roach and Claire Sie for their guidance throughout the project. Additionally, the R function used to generate error bars for the differential abundance analysis of predicted pathways was provided by Avril Metcalfe-Roach. This code was essential for visualizing the LinDa output within this repository. Source code for this function is stored under R_Scripts/functional_analysis

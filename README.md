@@ -30,6 +30,41 @@ Identify the predicted metabolic pathways to understand vitamin C related shifts
 ### 4. Predictive Modeling
 Determine whether vitamin C associated mcirobial markers can serve as reliable predictors for PD age of onset. 
 
+## Results
+### Main Findings
+**Vitamin C intake levels was not significantly associated with differences in gut microbiome.** 
+
+[Figure 1A](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_1A_Alpha%20Diversity%20Vitamin%20C_manuscript.jpeg) [Figure 1A](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_1B_beta_diversity_vitC.png) 
+**3 statistically significant genera were associated with vitamin C intake levels.**
+
+[Table 1](https://github.com/sskyeung/micb305/blob/main/Results/Table/Table_1_indicator_taxa_table.png)
+
+**Identified indicator taxa are characterized by low relative abundance.**
+
+[Figure 2](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_2_indic_abun.png)
+
+**Vitamin C intake correlates with increased abundance of the genus UCG-005.**
+
+[Figure 3A](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_3A_daa_low_high.png) [Figure 3B](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_3B_daa_lowtyp.png) 
+
+**High vitamin C intake is associated with altered predicted microbial metabolic profiles.**
+
+[Figure 4A](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_4A_pathway_pca_vc.png) [Figure 4B](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_4B_pathway_volcano.png) [Figure 4C](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_4B_pathway_volcano.png)
+
+***Escherichia-Shigella* correlates with observed predicted functional shift, but no correlation with age of onset.**
+
+[Figure 5](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_5_partial_matrix.png) 
+
+**The regression random forest model ultimately indicates that vitamin C associated taxa have no predictive power for PD age of onset.**
+
+[Figure 6](https://github.com/sskyeung/micb305/blob/main/Results/Figures/Figure_6_random_forest_linear_regression_plot.png)
+
+### Supplementary Figures and Tables
+
+[Figure S1]() [Figure S2](https://github.com/sskyeung/micb305/blob/main/Results/Figures/supplementary_figure_2_Alpha_Diversity_supp.jpeg) [Figure S3](https://github.com/sskyeung/micb305/blob/main/Results/Figures/supplementary_figure_3_full_matrix.png) [Figure S4](https://github.com/sskyeung/micb305/blob/main/Results/Figures/supplementary_figure_4_RMSE_cross_validation.png)
+
+[Table S1](https://github.com/sskyeung/micb305/blob/main/Results/Table/supplementary_table_1_antioxidant_tertile_ranges.png) [Table S2](https://github.com/sskyeung/micb305/blob/main/Results/Table/supplementary_table_2_prevalance_key_taxa.png)
+
 ## Relevant Documents
 Proposal:
 https://ubcca-my.sharepoint.com/:w:/r/personal/dgordo05_student_ubc_ca/Documents/MICB_305_proposal.docx?d=w9e17d40f9a2545d48d65e9a237ae4ac4&csf=1&web=1&e=30xfP3

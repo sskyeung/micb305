@@ -13,7 +13,7 @@ We aim to explore how dietary vitamin C influences the gut microbiome compositio
 Does dietary vitamin C modulate the gut microbiome in a way that significantly influences the age of onset in Parkinson's Disease patients?
 
 ## Dataset
-Data was sourced from **[Cirstae et al. (2020)](https://doi.org/10.1002/mds.28052)** study, comprising faecal 16s rRNA sequences and comprehensive dietary metadata from 197 PD patients. The metadata includes intake levels of eight primary antioxidants and cliical records of disease age of onset.
+Data was sourced from **[Cirstea et al. (2020)](https://doi.org/10.1002/mds.28052)** study, comprising faecal 16s rRNA sequences and comprehensive dietary metadata from 197 PD patients. The metadata includes intake levels of eight primary antioxidants and cliical records of disease age of onset.
 
 ## Objective
 We answered the research question through four primary objectives:

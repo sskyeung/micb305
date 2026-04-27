@@ -72,7 +72,7 @@ micb305
 |   |
 |   |-- Table -- contains all tables used in the manuscript
 |
-|-- data -- Data used for analysis in R 
+|-- data -- includes QIIME2 and PICRUSt2 outputs and data used for analysis in R 
 |   
 |-- Meeting_notes -- meeting notes and agenda with MICB_305 teaching team
 ```

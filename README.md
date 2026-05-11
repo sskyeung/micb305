@@ -64,7 +64,9 @@ Presentation Slides:
 https://ubcca-my.sharepoint.com/:p:/g/personal/rmurata_student_ubc_ca/IQAQyVowzAj7TJEQHWp4Q4cEAaxBaiYWOCawLBpLfkEuQBk?e=JhNsAe
 
 Manuscript Draft:
-https://ubcca-my.sharepoint.com/:w:/g/personal/rmurata_student_ubc_ca/IQDo9oW-kJ9lS5EAPJb-1mfHAUal7mWx9I_K3j_V22Q9fiw?e=NjXsCZ
+https://ubcca-my.sharepoint.com/:w:/g/personal/rmurata_student_ubc_ca/IQD2flm7tB_zRYXxNMIlwFJjAd_4aDaiyqcrVKyhH1JcX7k?e=waQF2M
+
+Note: Due to UBC policy, these documents will are only accesible to UBC student or faculty accounts. Please contact the authors if you require access.
 
 ## Directory Tree
 The following gives an overall structure of the repository. 
